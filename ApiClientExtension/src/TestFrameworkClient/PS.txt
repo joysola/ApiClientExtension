@@ -1,0 +1,3 @@
+﻿如果framework的程序集引用了standard程序集而未能加载standard程序集的dll，请在framework程序集csproj中加入
+<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
