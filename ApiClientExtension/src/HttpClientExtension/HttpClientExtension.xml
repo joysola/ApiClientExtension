@@ -42,6 +42,24 @@
             </summary>
             <param name="url"></param>
         </member>
+        <member name="M:HttpClientExtension.ApiClient.HttpClientEx.SetCustomRequestHead(System.String,System.String)">
+            <summary>
+            设定自定义请求头
+            </summary>
+            <param name="customHeader">请求头名称</param>
+            <param name="customContent">请求头内容</param>
+        </member>
+        <member name="M:HttpClientExtension.ApiClient.HttpClientEx.SetTimeout(System.Int32)">
+            <summary>
+            设置超时时间，默认5s
+            </summary>
+            <param name="milliseconds"></param>
+        </member>
+        <member name="T:HttpClientExtension.Attribute.BaseHttpAttribute">
+            <summary>
+            Http相关Attribute的父类
+            </summary>
+        </member>
         <member name="F:HttpClientExtension.Attribute.BaseHttpAttribute.apiResponseType">
             <summary>
             返回类型

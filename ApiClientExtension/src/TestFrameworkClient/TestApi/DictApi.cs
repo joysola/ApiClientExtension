@@ -18,7 +18,7 @@ namespace TestFrameworkClient
         /// <returns></returns>
         [Url("api/deepsight-system/system/dict/getList")]
         [HttpGet]
-        public ResponsePage<List<DictModel>> GetDict(string code) => GetResult();
+        public ApiResponse<List<DictModel>> GetDict(string code) => GetResult();
 
         /// <summary>
         /// 获取共建医院信息
@@ -26,7 +26,7 @@ namespace TestFrameworkClient
         /// <returns></returns>
         [Url("api/deepsight-fund/fund/hospital/getHospitalByLogin")]
         [HttpGet]
-        public ApiResponse<HotpitalModel> GetHotpitalInfo() => GetResult();
+        public Task<ApiResponse<HotpitalModel>> GetHotpitalInfo() => GetResult();
 
         /// <summary>
         /// 获取该院所有送检医生
@@ -34,7 +34,7 @@ namespace TestFrameworkClient
         /// <returns></returns>
         [Url("api/deepsight-system/user/listDoctorByLoginId")]
         [HttpGet]
-        public ResponsePage<List<SubmitDoctorModel>> GetSubmitDoctors() => GetResult();
+        public ApiResponse<List<SubmitDoctorModel>> GetSubmitDoctors() => GetResult();
 
         /// <summary>
         /// 获取检验项目字典
@@ -42,7 +42,7 @@ namespace TestFrameworkClient
         /// <returns></returns>
         [Url("api/deepsight-fund/fund/product/listDetails")]
         [HttpGet]
-        public ResponsePage<List<ProductModel>> GetProductModels() => GetResult();
+        public ApiResponse<List<ProductModel>> GetProductModels() => GetResult();
 
     }
 }
