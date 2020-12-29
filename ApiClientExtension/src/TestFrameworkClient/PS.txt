@@ -1,3 +1,23 @@
 ﻿如果framework的程序集引用了standard程序集而未能加载standard程序集的dll，请在framework程序集csproj中加入
 <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+
+开发阶段：可以直接引用HttpClientExtension项目，不需要额外添加程序集
+
+注意：
+     如若引用生成的程序集HttpClientExtension，
+     (1) 则需要在对应“程序集分析器”中添加：analyzers下所有程序集（可以不做！）
+            AspectInjector.Analyzer.dll、
+            AspectInjector.Broker.dll、
+            AspectInjector.Rules.dll、
+            FluentIL.Common.dll
+
+     (2) 需要添加引用：lib文件夹下的 
+            AspectInjector.Broker.dll
+            Newtonsoft.Json.dll
+
+     (3) 需要在csprj文件中加入：（重点！）
+           <Import Project="..\..\lib\AspectInjector.2.4.2\build\netstandard2.0\AspectInjector.targets" Condition="Exists('..\..\lib\AspectInjector.2.4.2\build\netstandard2.0\AspectInjector.targets')" />
+
+     (4) netframework程序集需要引用 Microsoft.CSharp
+         netstandard、core需要安装 Microsoft.CSharp
