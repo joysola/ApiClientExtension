@@ -348,3 +348,8 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/ApiClientExtension/lib/461
+/ApiClientExtension/lib/aspectinjector
+/ApiClientExtension/lib/Newtonsoft.Json.xml
+/ApiClientExtension/lib/Newtonsoft.Json.dll
+/ApiClientExtension/lib/netstandard.dll
