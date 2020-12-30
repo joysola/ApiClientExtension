@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TestModel\TestModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="HttpClientExtension">
+      <HintPath>..\..\lib\HttpClientExtension.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="..\..\lib\AspectInjector.2.4.2\build\netstandard2.0\AspectInjector.targets" Condition="Exists('..\..\lib\AspectInjector.2.4.2\build\netstandard2.0\AspectInjector.targets')" />
+
+</Project>

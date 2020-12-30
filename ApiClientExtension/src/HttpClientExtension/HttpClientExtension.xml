@@ -111,6 +111,20 @@
             <param name="url"></param>
             <returns></returns>
         </member>
+        <member name="M:HttpClientExtension.Attribute.BaseHttpAttribute.BuildSetbaseResultAction(System.Object,System.Object)">
+            <summary>
+            生成给instance（父类）的baseResult赋值的action
+            </summary>
+            <param name="instance"></param>
+            <param name="result"></param>
+        </member>
+        <member name="M:HttpClientExtension.Attribute.BaseHttpAttribute.SetbaseResult(System.Object,System.Object)">
+            <summary>
+            instance（父类）的baseResult赋值
+            </summary>
+            <param name="instance"></param>
+            <param name="result"></param>
+        </member>
         <member name="T:HttpClientExtension.Attribute.HttpGetAttribute">
             <summary>
             httpget请求特性

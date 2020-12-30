@@ -9,6 +9,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CSharp.RuntimeBinder;
+using System.Linq.Expressions;
+using System.Diagnostics;
+
 namespace HttpClientExtension.Attribute
 {
     /// <summary>
@@ -17,6 +20,7 @@ namespace HttpClientExtension.Attribute
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
     public abstract class BaseHttpAttribute : System.Attribute
     {
+        private static readonly Dictionary<Type, Action<object, dynamic>> setFieldValueDict = new Dictionary<Type, Action<object, dynamic>>();
         /// <summary>
         /// 返回类型
         /// </summary>
@@ -82,12 +86,12 @@ namespace HttpClientExtension.Attribute
             if (httpResponse.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var json = httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
-                dynamic ins = instance; // 转成动态类型
-                var baseResult = instance.GetType().BaseType.GetField("baseResult", BindingFlags.NonPublic | BindingFlags.Instance); // 获取BaseResult属性（父类中）
-                if (baseResult == null)
-                {
-                    throw new HttpClientException("GetResult方法获取对应字段失败！");
-                }
+                //dynamic ins = instance; // 转成动态类型
+                //var baseResult = instance.GetType().BaseType.GetField("baseResult", BindingFlags.NonPublic | BindingFlags.Instance); // 获取BaseResult属性（父类中）
+                //if (baseResult == null)
+                //{
+                //    throw new HttpClientException("GetResult方法获取对应字段失败！");
+                //}
                 try
                 {
                     if (rtype.IsGenericType && rtype.GetGenericTypeDefinition() == typeof(Task<>)) // 异步
@@ -95,12 +99,14 @@ namespace HttpClientExtension.Attribute
                         dynamic result = JsonConvert.DeserializeObject(json, rtype.GenericTypeArguments[0]);
                         //var result = Convert.ChangeType(zzz.data, rtype.GenericTypeArguments[0]);
                         var taskResult = Task.FromResult(result); // 结果装入Task
-                        baseResult.SetValue(ins, taskResult, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
+                        SetbaseResult(instance, taskResult);
+                        //baseResult.SetValue(ins, taskResult, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
                     }
                     else // 同步
                     {
                         dynamic result = JsonConvert.DeserializeObject(json, rtype);
-                        baseResult.SetValue(ins, result, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
+                        //baseResult.SetValue(ins, result, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
+                        SetbaseResult(instance, result);
                     }
                 }
                 catch (Exception ex)
@@ -108,7 +114,6 @@ namespace HttpClientExtension.Attribute
                     //Logger.Error("HttpBase出错！", ex);
                     throw;
                 }
-
             }
             else
             {
@@ -152,6 +157,43 @@ namespace HttpClientExtension.Attribute
                 //Logger.Error("ApiGet方法出错！", ex);
                 throw new HttpClientException($"WebApi访问失败！{ex.InnerException.Message}", ex);
             }
+        }
+        /// <summary>
+        /// 生成给instance（父类）的baseResult赋值的action
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="result"></param>
+        private Action<object, dynamic> BuildSetbaseResultAction(object instance, dynamic result)
+        {
+            var insType = instance.GetType();
+            if (setFieldValueDict.TryGetValue(insType, out Action<object, dynamic> action))
+            {
+                return action;
+            }
+            var baseType = instance.GetType().BaseType; // 父类类型
+            var param_ins = Expression.Parameter(typeof(object), "ins"); // 输入instance参数
+            var param_val = Expression.Parameter(typeof(object), "val"); // 输入需要给字段赋值的数据
+            var convertBaseExpre = Expression.Convert(param_ins, baseType); // 子类没有baseResult字段，因此需要转换成父类
+            var fieldExp = Expression.Field(convertBaseExpre, baseType, "baseResult"); // 获取baseResult字段(此处可以直接访问私有字段...)
+
+            var setfieldExp = Expression.Assign(fieldExp, param_val); // 赋值
+            var setfieldAction = Expression.Lambda<Action<object, dynamic>>(setfieldExp, param_ins, param_val).Compile(); // 构建字段赋值
+            setFieldValueDict.Add(insType, setfieldAction);
+            return setfieldAction;
+            //setfieldAction(instance, result);
+            // 查看是否成功赋值
+            //var getfieldFunc = Expression.Lambda<Func<object, dynamic>>(fieldExp, param_ins).Compile();
+            //var xx = getfieldFunc(instance);
+        }
+        /// <summary>
+        /// instance（父类）的baseResult赋值
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="result"></param>
+        private void SetbaseResult(object instance, dynamic result)
+        {
+            var action = BuildSetbaseResultAction(instance, result);
+            action(instance, result);
         }
     }
 }
