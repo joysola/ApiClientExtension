@@ -17,6 +17,15 @@ namespace HttpClientExtension.ApiClient
         /// 单例Httpclient
         /// </summary>
         internal static HttpClient Singleton => _singleton;
+        internal class PreProcess
+        {
+            internal Type PreProcesstype;
+            internal Action<dynamic> PreAction;
+        }
+        /// <summary>
+        /// 预处理
+        /// </summary>
+        internal static PreProcess PreProcedure { get; } = new PreProcess();
         /// <summary>
         /// 用于更改Url
         /// </summary>
@@ -58,6 +67,16 @@ namespace HttpClientExtension.ApiClient
             {
                 _singleton.Timeout = TimeSpan.FromMilliseconds(milliseconds);
             }
+        }
+        /// <summary>
+        /// 设置预判,用以验证api返回的json
+        /// </summary>
+        /// <param name="preType">json转的验证类型</param>
+        /// <param name="action">验证方法(传入json转换后的对象,类型时preType)</param>
+        public static void SetPrePorcess(Type preType, Action<dynamic> action)
+        {
+            PreProcedure.PreProcesstype = preType;
+            PreProcedure.PreAction = action;
         }
     }
 }

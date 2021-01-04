@@ -36,6 +36,11 @@
             单例Httpclient
             </summary>
         </member>
+        <member name="P:HttpClientExtension.ApiClient.HttpClientEx.PreProcedure">
+            <summary>
+            预处理
+            </summary>
+        </member>
         <member name="M:HttpClientExtension.ApiClient.HttpClientEx.InitApiClient(System.String)">
             <summary>
             用于更改Url
@@ -55,14 +60,16 @@
             </summary>
             <param name="milliseconds"></param>
         </member>
+        <member name="M:HttpClientExtension.ApiClient.HttpClientEx.SetPrePorcess(System.Type,System.Action{System.Object})">
+            <summary>
+            设置预判,用以验证api返回的json
+            </summary>
+            <param name="preType">json转的验证类型</param>
+            <param name="action">验证方法(传入json转换后的对象,类型时preType)</param>
+        </member>
         <member name="T:HttpClientExtension.Attribute.BaseHttpAttribute">
             <summary>
             Http相关Attribute的父类
-            </summary>
-        </member>
-        <member name="F:HttpClientExtension.Attribute.BaseHttpAttribute.apiResponseType">
-            <summary>
-            返回类型
             </summary>
         </member>
         <member name="T:HttpClientExtension.Attribute.BaseHttpAttribute.UrlResult">

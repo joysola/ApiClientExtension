@@ -24,7 +24,8 @@ namespace HttpClientExtension.Attribute
         /// <summary>
         /// 返回类型
         /// </summary>
-        public Type apiResponseType; //typeof(ApiResponse<>);
+        // public Type preApiType; //typeof(ApiResponse<>);
+
         /// <summary>
         /// url处理后的结果
         /// </summary>
@@ -86,6 +87,12 @@ namespace HttpClientExtension.Attribute
             if (httpResponse.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var json = httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
+                // 预判
+                if (HttpClientEx.PreProcedure.PreAction != null && HttpClientEx.PreProcedure.PreProcesstype != null)
+                {
+                    dynamic preResult = JsonConvert.DeserializeObject(json, HttpClientEx.PreProcedure.PreProcesstype);
+                    HttpClientEx.PreProcedure.PreAction(preResult); // 执行预判方法
+                }
                 //dynamic ins = instance; // 转成动态类型
                 //var baseResult = instance.GetType().BaseType.GetField("baseResult", BindingFlags.NonPublic | BindingFlags.Instance); // 获取BaseResult属性（父类中）
                 //if (baseResult == null)
