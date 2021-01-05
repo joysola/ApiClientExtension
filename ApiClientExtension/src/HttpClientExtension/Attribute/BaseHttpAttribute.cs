@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using Microsoft.CSharp.RuntimeBinder;
 using System.Linq.Expressions;
 using System.Diagnostics;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace HttpClientExtension.Attribute
 {
@@ -21,6 +23,21 @@ namespace HttpClientExtension.Attribute
     public abstract class BaseHttpAttribute : System.Attribute
     {
         private static readonly Dictionary<Type, Action<object, dynamic>> setFieldValueDict = new Dictionary<Type, Action<object, dynamic>>();
+        /// <summary>
+        /// 获取参数的PostContentAttribute 特性的方法
+        /// </summary>
+        private Lazy<Func<ParameterInfo, PostContentAttribute>> getPostConAttri = new Lazy<Func<ParameterInfo, PostContentAttribute>>(() =>
+        {
+            return BuildGetAttribute<PostContentAttribute>();
+        });
+        /// <summary>
+        /// 获取参数的ParamNameAttribute 特性的方法
+        /// </summary>
+        private Lazy<Func<ParameterInfo, ParamNameAttribute>> getParamNameAttri = new Lazy<Func<ParameterInfo, ParamNameAttribute>>(() =>
+        {
+            return BuildGetAttribute<ParamNameAttribute>();
+        });
+        private static readonly object locker = new object();
         /// <summary>
         /// 返回类型
         /// </summary>
@@ -53,16 +70,35 @@ namespace HttpClientExtension.Attribute
             object postModel = null; // post实体
             // 构建完整url
             var parameters = methodBase.GetParameters();
-            var dict = new Dictionary<string, object>();
+            var dict = new List<KeyValuePair<string, object>>();
             for (int i = 0; i < arguments.Length; i++)
             {
-                if (!parameters[i].IsDefined(typeof(PostContentAttribute)))
+                //if (!parameters[i].IsDefined(typeof(PostContentAttribute)))
+                //{
+                //    dict.Add(parameters[i].Name, arguments[i]);
+                //}
+                //else
+                //{
+                //    postModel = arguments[i];
+                //}
+                var postConAttr = getPostConAttri.Value(parameters[i]); // 获取post参数特性
+                var parNameAttr = getParamNameAttri.Value(parameters[i]); // 获取改名参数特性
+                // 是否是post实体
+                if (postConAttr != null)
                 {
-                    dict.Add(parameters[i].Name, arguments[i]);
+                    postModel = arguments[i]; // post参数不用拼接url
                 }
                 else
                 {
-                    postModel = arguments[i];
+                    // 判断Url参数是否需要改名字
+                    if (parNameAttr != null)
+                    {
+                        dict.Add(new KeyValuePair<string, object>(parNameAttr.ParamName, arguments[i]));
+                    }
+                    else
+                    {
+                        dict.Add(new KeyValuePair<string, object>(parameters[i].Name, arguments[i]));
+                    }
                 }
             }
             var paramUrl = string.Empty; // url参数
@@ -173,20 +209,28 @@ namespace HttpClientExtension.Attribute
         private Action<object, dynamic> BuildSetbaseResultAction(object instance, dynamic result)
         {
             var insType = instance.GetType();
-            if (setFieldValueDict.TryGetValue(insType, out Action<object, dynamic> action))
+            Action<object, dynamic> action = null;
+            if (setFieldValueDict.TryGetValue(insType, out action))
             {
                 return action;
             }
-            var baseType = instance.GetType().BaseType; // 父类类型
-            var param_ins = Expression.Parameter(typeof(object), "ins"); // 输入instance参数
-            var param_val = Expression.Parameter(typeof(object), "val"); // 输入需要给字段赋值的数据
-            var convertBaseExpre = Expression.Convert(param_ins, baseType); // 子类没有baseResult字段，因此需要转换成父类
-            var fieldExp = Expression.Field(convertBaseExpre, baseType, "baseResult"); // 获取baseResult字段(此处可以直接访问私有字段...)
-
-            var setfieldExp = Expression.Assign(fieldExp, param_val); // 赋值
-            var setfieldAction = Expression.Lambda<Action<object, dynamic>>(setfieldExp, param_ins, param_val).Compile(); // 构建字段赋值
-            setFieldValueDict.Add(insType, setfieldAction);
-            return setfieldAction;
+            lock (locker)
+            {
+                // 双检锁。。。
+                if (setFieldValueDict.TryGetValue(insType, out action))
+                {
+                    return action;
+                }
+                var baseType = instance.GetType().BaseType; // 父类类型
+                var param_ins = Expression.Parameter(typeof(object), "ins"); // 输入instance参数
+                var param_val = Expression.Parameter(typeof(object), "val"); // 输入需要给字段赋值的数据
+                var convertBaseExpre = Expression.Convert(param_ins, baseType); // 子类没有baseResult字段，因此需要转换成父类
+                var fieldExp = Expression.Field(convertBaseExpre, baseType, "baseResult"); // 获取baseResult字段(此处可以直接访问私有字段...)
+                var setfieldExp = Expression.Assign(fieldExp, param_val); // 赋值
+                var setfieldAction = Expression.Lambda<Action<object, dynamic>>(setfieldExp, param_ins, param_val).Compile(); // 构建字段赋值
+                setFieldValueDict.Add(insType, setfieldAction);
+                return setfieldAction;
+            }
             //setfieldAction(instance, result);
             // 查看是否成功赋值
             //var getfieldFunc = Expression.Lambda<Func<object, dynamic>>(fieldExp, param_ins).Compile();
@@ -202,5 +246,28 @@ namespace HttpClientExtension.Attribute
             var action = BuildSetbaseResultAction(instance, result);
             action(instance, result);
         }
+        /// <summary>
+        /// 构造ParameterInfo的GetAttribute方法的表达式树
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        private static Func<ParameterInfo, T> BuildGetAttribute<T>()
+        {
+            var param_ParameterInfo = Expression.Parameter(typeof(ParameterInfo), "ParamInfo");
+            // 非泛型方法
+            //var cons_Attr = Expression.Constant(typeof(T)); // 常量
+            //var methodInfo = typeof(CustomAttributeExtensions).GetMethod("GetCustomAttribute", new Type[] { typeof(ParameterInfo), typeof(Type) });
+            //var methodCallExp = Expression.Call(null, methodInfo, param_ParameterInfo, cons_Attr);
+            //var unaryExpression = Expression.Convert(methodCallExp, typeof(T));
+            //var func = Expression.Lambda<Func<ParameterInfo, T>>(unaryExpression, param_ParameterInfo).Compile();
+
+            // 泛型方法
+            var methodInfo2 = typeof(CustomAttributeExtensions).GetMethod("GetCustomAttribute", new Type[] { typeof(ParameterInfo) }).MakeGenericMethod(typeof(T));
+            var methodCallExp2 = Expression.Call(null, methodInfo2, param_ParameterInfo); // 调用静态方法，第一个参数是null
+            var func2 = Expression.Lambda<Func<ParameterInfo, T>>(methodCallExp2, param_ParameterInfo).Compile();
+            return func2;
+        }
+
+
     }
 }

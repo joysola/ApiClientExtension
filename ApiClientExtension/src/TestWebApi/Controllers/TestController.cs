@@ -35,12 +35,29 @@ namespace TestWebApi.Controllers
             return Task.FromResult<bool>(aa > bb);
         }
 
+        [HttpGet]
+        [Route("[action]")]
+        public Task<bool> TestGet4(int AAA, int bb, bool dd)
+        {
+            return Task.FromResult<bool>(AAA > bb);
+        }
+
         [Route("[action]")]
         [HttpPost]
         public Task<TestMainModel> TestPost1(int aa, bool bb, [FromBody] TestMainModel content)
         {
             content.SubModel.Sub3 = "changeSub";
             content.Test1 = 200;
+            return Task.FromResult<TestMainModel>(content);
+        }
+
+        [Route("[action]")]
+        [HttpPost]
+        public Task<TestMainModel> TestPost2(int AAA, bool BBB, [FromBody] TestMainModel content)
+        {
+            content.SubModel.Sub2 = BBB;
+            content.SubModel.Sub3 = "changeSub2";
+            content.Test1 = AAA;
             return Task.FromResult<TestMainModel>(content);
         }
     }

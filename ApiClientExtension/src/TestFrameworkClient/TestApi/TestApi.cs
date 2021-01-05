@@ -24,8 +24,16 @@ namespace TestFrameworkClient
         [HttpGet]
         public bool TestGet3(int aa, int bb, bool dd) => GetResult();
 
+        [Url("api/Test/TestGet4")]
+        [HttpGet]
+        public bool TestGet4([ParamName("AA")]int aa, int bb, bool dd) => GetResult();
+
         [Url("api/Test/TestPost1")]
         [HttpPost]
         public TestMainModel TestPost1(int aa, bool bb, [PostContent] TestMainModel content) => GetResult();
+
+        [Url("api/Test/TestPost2")]
+        [HttpPost]
+        public TestMainModel TestPost2([ParamName("AA")] int aa, [ParamName("BBB")] bool bb, [PostContent] TestMainModel content) => GetResult();
     }
 }
