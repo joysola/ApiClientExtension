@@ -37,6 +37,21 @@ namespace HttpClientExtension.Attribute
         {
             return BuildGetAttribute<ParamNameAttribute>();
         });
+        /// <summary>
+        /// 获取调用tostring方法的实际对象
+        /// </summary>
+        private Lazy<Func<object, Type>> getToStringType = new Lazy<Func<object, Type>>(() =>
+        {
+            // 实现如下效果：xx.GetType().GetMethod("ToString", new Type[] { }).DeclaringType;
+            var param_obj = Expression.Parameter(typeof(object), "obj");
+            var method_getTypeExp = Expression.Call(param_obj, "GetType", null);
+            var cons_Str = Expression.Constant("ToString");
+            var cons_TypeArr = Expression.Constant(new Type[] { });
+            var method_getMethodExp = Expression.Call(method_getTypeExp, "GetMethod", null, cons_Str, cons_TypeArr);
+            var propExp = Expression.Property(method_getMethodExp, "DeclaringType");
+            var func = Expression.Lambda<Func<object, Type>>(propExp, param_obj).Compile();
+            return func;
+        });
         private static readonly object locker = new object();
         /// <summary>
         /// 返回类型
@@ -104,8 +119,9 @@ namespace HttpClientExtension.Attribute
             var paramUrl = string.Empty; // url参数
             if (dict.Count > 0)
             {
-                var paramUrlArray = dict.Select(x => $"{x.Key}={x.Value}").ToArray();
-                paramUrl = $"?{string.Join("&", paramUrlArray)}";
+                //var paramUrlArray = dict.Select(x => $"{x.Key}={x.Value}").ToArray();
+                //paramUrl = $"?{string.Join("&", paramUrlArray)}";
+                paramUrl = this.GetUrlParam(dict);
             }
             var url = $"{baseUrl}{paramUrl}";
             return new UrlResult { Url = url, PostModel = postModel };
@@ -267,7 +283,29 @@ namespace HttpClientExtension.Attribute
             var func2 = Expression.Lambda<Func<ParameterInfo, T>>(methodCallExp2, param_ParameterInfo).Compile();
             return func2;
         }
-
-
+        /// <summary>
+        /// 获取Url参数
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private string GetUrlParam(List<KeyValuePair<string, object>> list)
+        {
+            var resList = new List<string>();
+            foreach (var kp in list)
+            {
+                var toStringType = getToStringType.Value(kp.Value);
+                if (toStringType == typeof(object)) // 未重载toString方法，跳过
+                {
+                    continue;
+                }
+                else // 重载了tostring
+                {
+                    resList.Add($"{kp.Key}={kp.Value}");
+                }
+            }
+            var paramUrlArray = resList.ToArray();
+            var paramUrl = $"?{string.Join("&", paramUrlArray)}";
+            return paramUrl;
+        }
     }
 }

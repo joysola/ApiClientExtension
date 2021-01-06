@@ -82,6 +82,11 @@
             获取参数的ParamNameAttribute 特性的方法
             </summary>
         </member>
+        <member name="F:HttpClientExtension.Attribute.BaseHttpAttribute.getToStringType">
+            <summary>
+            获取对象的tostring方法的对象
+            </summary>
+        </member>
         <member name="T:HttpClientExtension.Attribute.BaseHttpAttribute.UrlResult">
             <summary>
             url处理后的结果
@@ -147,6 +152,13 @@
             构造ParameterInfo的GetAttribute方法的表达式树
             </summary>
             <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:HttpClientExtension.Attribute.BaseHttpAttribute.GetUrlParam(System.Collections.Generic.List{System.Collections.Generic.KeyValuePair{System.String,System.Object}})">
+            <summary>
+            获取Url参数
+            </summary>
+            <param name="list"></param>
             <returns></returns>
         </member>
         <member name="T:HttpClientExtension.Attribute.HttpGetAttribute">

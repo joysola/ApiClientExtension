@@ -97,26 +97,26 @@ namespace TestFrameworkClient
         static async Task Test()
         {
             await Task.Delay(3000);
-            HttpClientEx.InitApiClient("http://localhost:5000");
-            var tk1 = Task.Run(() => TestApi.Client.TestGet1(1, 2, "get1"));
-            var tk2 = Task.Run(() => TestApi.Client.TestGet2(0.12m, 0.4f, "get2"));
-            var tk3 = Task.Run(() => TestApi.Client.TestGet3(3, 4, true));
-            var tk4 = Task.Run(() => TestApi.Client.TestPost1(1, false, new TestMainModel
-            {
-                SubModel = new TestSubModel { Sub1 = 3, Sub2 = true, Sub3 = "sub" },
-                Test1 = 2,
-                Test2 = false,
-                Test3 = "Main"
-            }));
-            var tk5 = Task.Run(() => TestApi.Client.TestPost2(111, true, new TestMainModel
-            {
-                SubModel = new TestSubModel { Sub1 = 3, Sub2 = true, Sub3 = "sub2" },
-                Test1 = 2,
-                Test2 = false,
-                Test3 = "Main222"
-            }));
-            var tk6 = Task.Run(() => TestApi.Client.TestGet4(333, 4, true));
-            await Task.WhenAll(tk1, tk2, tk3, tk4, tk5, tk6);
+            //HttpClientEx.InitApiClient("http://localhost:5000");
+            //var tk1 = Task.Run(() => TestApi.Client.TestGet1(1, 2, "get1"));
+            //var tk2 = Task.Run(() => TestApi.Client.TestGet2(0.12m, 0.4f, "get2"));
+            //var tk3 = Task.Run(() => TestApi.Client.TestGet3(3, 4, true));
+            //var tk4 = Task.Run(() => TestApi.Client.TestPost1(1, false, new TestMainModel
+            //{
+            //    SubModel = new TestSubModel { Sub1 = 3, Sub2 = true, Sub3 = "sub" },
+            //    Test1 = 2,
+            //    Test2 = false,
+            //    Test3 = "Main"
+            //}));
+            //var tk5 = Task.Run(() => TestApi.Client.TestPost2(111, true, new TestMainModel
+            //{
+            //    SubModel = new TestSubModel { Sub1 = 3, Sub2 = true, Sub3 = "sub2" },
+            //    Test1 = 2,
+            //    Test2 = false,
+            //    Test3 = "Main222"
+            //}));
+            //var tk6 = Task.Run(() => TestApi.Client.TestGet4(333, 4, true));
+            //await Task.WhenAll(tk1, tk2, tk3, tk4, tk5, tk6);
         }
     }
 }
