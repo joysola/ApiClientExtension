@@ -84,7 +84,7 @@
         </member>
         <member name="F:HttpClientExtension.Attribute.BaseHttpAttribute.getToStringType">
             <summary>
-            获取对象的tostring方法的对象
+            获取调用tostring方法的实际对象
             </summary>
         </member>
         <member name="T:HttpClientExtension.Attribute.BaseHttpAttribute.UrlResult">
