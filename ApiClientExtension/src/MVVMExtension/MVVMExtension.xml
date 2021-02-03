@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MVVMExtension</name>
+    </assembly>
+    <members>
+        <member name="T:MVVMExtension.NotificationAttribute">
+            <summary>
+            MVVM属性通知变化
+            </summary>
+        </member>
+        <member name="M:MVVMExtension.NotificationAttribute.AfterSetter(System.Object,System.String)">
+            <summary>
+            setter方法后调用RaisePropertyChanged
+            </summary>
+            <param name="sender">属性值</param>
+            <param name="propertyName">属性名称</param>
+        </member>
+    </members>
+</doc>

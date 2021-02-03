@@ -15,7 +15,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestFrameworkClient", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestFrameworkbyDLL", "src\TestFrameworkbyDLL\TestFrameworkbyDLL.csproj", "{CD38FF41-6784-4905-882E-E78E6EA51B5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestClientbyDLL", "src\TestClientbyDLL\TestClientbyDLL.csproj", "{16097AE9-5FA4-48B2-90C2-8E543B785860}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestClientbyDLL", "src\TestClientbyDLL\TestClientbyDLL.csproj", "{16097AE9-5FA4-48B2-90C2-8E543B785860}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVVMExtension", "src\MVVMExtension\MVVMExtension.csproj", "{40645470-3898-4D22-8F9C-9D4B853E2CCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{16097AE9-5FA4-48B2-90C2-8E543B785860}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16097AE9-5FA4-48B2-90C2-8E543B785860}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16097AE9-5FA4-48B2-90C2-8E543B785860}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40645470-3898-4D22-8F9C-9D4B853E2CCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40645470-3898-4D22-8F9C-9D4B853E2CCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40645470-3898-4D22-8F9C-9D4B853E2CCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40645470-3898-4D22-8F9C-9D4B853E2CCE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
