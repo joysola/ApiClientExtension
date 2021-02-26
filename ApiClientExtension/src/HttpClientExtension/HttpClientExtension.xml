@@ -41,6 +41,11 @@
             预处理
             </summary>
         </member>
+        <member name="P:HttpClientExtension.ApiClient.HttpClientEx.BenchmarkSettingInfo">
+            <summary>
+            测速配置
+            </summary>
+        </member>
         <member name="M:HttpClientExtension.ApiClient.HttpClientEx.InitApiClient(System.String)">
             <summary>
             用于更改Url
@@ -66,6 +71,13 @@
             </summary>
             <param name="preType">json转的验证类型</param>
             <param name="action">验证方法(传入json转换后的对象,类型时preType)</param>
+        </member>
+        <member name="M:HttpClientExtension.ApiClient.HttpClientEx.SetBenchmark(System.Action{System.String},HttpClientExtension.Model.BenchmarkType)">
+            <summary>
+            
+            </summary>
+            <param name="benchmarkAct"></param>
+            <param name="benchmarkType"></param>
         </member>
         <member name="T:HttpClientExtension.Attribute.BaseHttpAttribute">
             <summary>
@@ -166,22 +178,24 @@
             httpget请求特性
             </summary>
         </member>
-        <member name="M:HttpClientExtension.Attribute.HttpGetAttribute.Before(System.String,System.Object[])">
+        <member name="M:HttpClientExtension.Attribute.HttpGetAttribute.Before(System.String,System.Object[],System.Type,System.Object)">
             <summary>
             调用前
             </summary>
             <param name="name"></param>
             <param name="arguments"></param>
+            <param name="type"></param>
+            <param name="instance"></param>
         </member>
-        <member name="M:HttpClientExtension.Attribute.HttpGetAttribute.After(System.String,System.Object[],System.Object)">
+        <member name="M:HttpClientExtension.Attribute.HttpGetAttribute.After(System.String,System.Object,System.Object)">
             <summary>
             调用后
             </summary>
             <param name="name"></param>
-            <param name="arguments"></param>
             <param name="returnValue"></param>
+            <param name="instance"></param>
         </member>
-        <member name="M:HttpClientExtension.Attribute.HttpGetAttribute.Around(System.String,System.Object[],System.Func{System.Object[],System.Object},System.Object,System.Type,System.Reflection.MethodBase)">
+        <member name="M:HttpClientExtension.Attribute.HttpGetAttribute.Around(System.String,System.Object[],System.Func{System.Object[],System.Object},System.Object,System.Type,System.Type,System.Reflection.MethodBase)">
             <summary>
             调用时
             </summary>
@@ -189,6 +203,7 @@
             <param name="arguments"></param>
             <param name="target"></param>
             <param name="instance"></param>
+            <param name="type"></param>
             <param name="rtype"></param>
             <param name="methodBase"></param>
             <returns></returns>
@@ -203,19 +218,22 @@
             自定义请求头
             </summary>
         </member>
-        <member name="M:HttpClientExtension.Attribute.HttpPostAttribute.Before(System.String,System.Object[])">
+        <member name="M:HttpClientExtension.Attribute.HttpPostAttribute.Before(System.String,System.Object[],System.Type,System.Object)">
             <summary>
             调用前
             </summary>
             <param name="name"></param>
             <param name="arguments"></param>
+            <param name="type"></param>
+            <param name="instance"></param>
         </member>
-        <member name="M:HttpClientExtension.Attribute.HttpPostAttribute.After(System.String,System.Object)">
+        <member name="M:HttpClientExtension.Attribute.HttpPostAttribute.After(System.String,System.Object,System.Object)">
             <summary>
             调用后
             </summary>
             <param name="name"></param>
             <param name="returnValue"></param>
+            <param name="instance"></param>
         </member>
         <member name="M:HttpClientExtension.Attribute.HttpPostAttribute.Around(System.String,System.Object[],System.Func{System.Object[],System.Object},System.Object,System.Type,System.Type,System.Reflection.MethodBase)">
             <summary>
@@ -283,6 +301,113 @@
             构造器，获取异常和异常信息
             </summary>
             <param name="msg"></param>
+        </member>
+        <member name="F:HttpClientExtension.Helper.BenchmarkHelper.parmFormat">
+            <summary>
+            格式化字符串
+            </summary>
+        </member>
+        <member name="M:HttpClientExtension.Helper.BenchmarkHelper.BeginBenchmark(System.String,System.Type,System.Object,System.Object[])">
+            <summary>
+            开始测速
+            </summary>
+            <param name="name"></param>
+            <param name="arguments"></param>
+            <param name="type"></param>
+            <param name="instance"></param>
+        </member>
+        <member name="M:HttpClientExtension.Helper.BenchmarkHelper.EndBenchmark(System.String,System.Type,System.Object,System.Object[])">
+            <summary>
+            测速终止
+            </summary>
+            <param name="name"></param>
+            <param name="arguments"></param>
+            <param name="type"></param>
+            <param name="instance"></param>
+        </member>
+        <member name="M:HttpClientExtension.Helper.OSHelper.GetOSFriendlyName">
+            <summary>
+            获取OS的名字
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HttpClientExtension.Helper.OSHelper.IsOSLowThanWin10">
+            <summary>
+            是否操作系统版本低于win10
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HttpClientExtension.Helper.OSHelper.GetOsName(System.OperatingSystem)">
+            <summary>
+            获取操作系统名称
+            </summary>
+            <param name="os_info"></param>
+            <returns></returns>
+        </member>
+        <member name="P:HttpClientExtension.Model.BenchmarkSeting.Type">
+            <summary>
+            测速类型
+            </summary>
+        </member>
+        <member name="P:HttpClientExtension.Model.BenchmarkSeting.BenchmarkAction">
+            <summary>
+            注册的测速方法
+            </summary>
+        </member>
+        <member name="F:HttpClientExtension.Model.BenchmarkSeting.DescDict">
+            <summary>
+            Detail的测速字典
+            </summary>
+        </member>
+        <member name="T:HttpClientExtension.Model.BenchmarkType">
+            <summary>
+            测速类型枚举
+            </summary>
+        </member>
+        <member name="F:HttpClientExtension.Model.BenchmarkType.None">
+            <summary>
+            不测速
+            </summary>
+        </member>
+        <member name="F:HttpClientExtension.Model.BenchmarkType.Simple">
+            <summary>
+            简单模式，提供url
+            </summary>
+        </member>
+        <member name="F:HttpClientExtension.Model.BenchmarkType.Detail">
+            <summary>
+            细节模式，提供详细测速细节
+            </summary>
+        </member>
+        <member name="T:HttpClientExtension.Model.Benchmark">
+            <summary>
+            测速类
+            </summary>
+        </member>
+        <member name="P:HttpClientExtension.Model.Benchmark.StartTime">
+            <summary>
+            开始时间
+            </summary>
+        </member>
+        <member name="P:HttpClientExtension.Model.Benchmark.EndTime">
+            <summary>
+            结束时间
+            </summary>
+        </member>
+        <member name="P:HttpClientExtension.Model.Benchmark.IntervalTime">
+            <summary>
+            时间间隔
+            </summary>
+        </member>
+        <member name="P:HttpClientExtension.Model.Benchmark.Desc">
+            <summary>
+            描述信息
+            </summary>
+        </member>
+        <member name="T:HttpClientExtension.Model.PreProcess">
+            <summary>
+            预处理结构
+            </summary>
         </member>
         <member name="T:HttpClientExtension.Service.BaseService`1">
             <summary>

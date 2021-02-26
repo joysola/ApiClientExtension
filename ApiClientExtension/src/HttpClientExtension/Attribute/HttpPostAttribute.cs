@@ -1,4 +1,7 @@
 ﻿using AspectInjector.Broker;
+using HttpClientExtension.ApiClient;
+using HttpClientExtension.Helper;
+using HttpClientExtension.Model;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -25,8 +28,14 @@ namespace HttpClientExtension.Attribute
         /// </summary>
         /// <param name="name"></param>
         /// <param name="arguments"></param>
+        /// <param name="type"></param>
+        /// <param name="instance"></param>
         [Advice(Kind.Before, Targets = Target.Method)]
-        public void Before([Argument(Source.Name)] string name, [Argument(Source.Arguments)] object[] arguments)
+        public void Before(
+            [Argument(Source.Name)] string name,
+            [Argument(Source.Arguments)] object[] arguments,
+            [Argument(Source.Type)] Type type,
+            [Argument(Source.Instance)] object instance)
         {
             //
         }
@@ -35,19 +44,14 @@ namespace HttpClientExtension.Attribute
         /// </summary>
         /// <param name="name"></param>
         /// <param name="returnValue"></param>
+        /// <param name="instance"></param>
         [Advice(Kind.After, Targets = Target.Method)]
-        public void After([Argument(Source.Name)] string name, [Argument(Source.ReturnValue)] object returnValue)
+        public void After(
+            [Argument(Source.Name)] string name,
+            [Argument(Source.ReturnValue)] object returnValue,
+            [Argument(Source.Instance)] object instance)
         {
-            //// 登录方法需要加入请求token
-            //if (name == "Login")
-            //{
-            //    LoginModel loginModel = returnValue as LoginModel;
-            //    if (DSTApiClient.Singleton.DefaultRequestHeaders.Contains(customHeader)) // 注销后，需要更新token
-            //    {
-            //        DSTApiClient.Singleton.DefaultRequestHeaders.Remove(customHeader);
-            //    }
-            //    DSTApiClient.Singleton.DefaultRequestHeaders.Add(customHeader, $"{loginModel.token_type} {loginModel.access_token}"); // 第一次登录获取token
-            //}
+            //
         }
         /// <summary>
         /// 调用时
@@ -75,7 +79,9 @@ namespace HttpClientExtension.Attribute
             var url = urlResult.Url;
             var postcontent = JsonConvert.SerializeObject(urlResult.PostModel); // 序列化需要发送的post实体
             var content = new StringContent(postcontent, Encoding.UTF8, "application/json"); // 必须带上encode和media-type
+            BenchmarkHelper.Instance.BeginBenchmark(name, type, instance, url);
             var postResponse = base.Post(url, content);//DSTApiClient.Singleton.PostAsync(url, content).ConfigureAwait(false).GetAwaiter().GetResult(); // post方法获取数据
+            BenchmarkHelper.Instance.EndBenchmark(name, type, instance, url);
             base.SetResultData(postResponse, instance, rtype);// 设置数据
             return target(arguments);
         }

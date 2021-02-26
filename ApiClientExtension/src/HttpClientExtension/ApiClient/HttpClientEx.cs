@@ -1,5 +1,9 @@
-﻿using System;
+﻿using HttpClientExtension.Helper;
+using HttpClientExtension.Model;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -17,15 +21,14 @@ namespace HttpClientExtension.ApiClient
         /// 单例Httpclient
         /// </summary>
         internal static HttpClient Singleton => _singleton;
-        internal class PreProcess
-        {
-            internal Type PreProcesstype;
-            internal Action<dynamic> PreAction;
-        }
         /// <summary>
         /// 预处理
         /// </summary>
         internal static PreProcess PreProcedure { get; } = new PreProcess();
+        /// <summary>
+        /// 测速配置
+        /// </summary>
+        internal static BenchmarkSeting BenchmarkSettingInfo { get; } = new BenchmarkSeting { Type = BenchmarkType.None };
         /// <summary>
         /// 用于更改Url
         /// </summary>
@@ -38,6 +41,11 @@ namespace HttpClientExtension.ApiClient
                 _singleton.Dispose();
                 _singleton = null;
             }
+            //if (OSHelper.IsOSLowThanWin10())
+            //{
+            //ServicePointManager.Expect100Continue = true;
+            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            //}
             _singleton = new HttpClient();
             _singleton.Timeout = TimeSpan.FromMilliseconds(5000);
             _singleton.BaseAddress = new Uri(url);
@@ -77,6 +85,17 @@ namespace HttpClientExtension.ApiClient
         {
             PreProcedure.PreProcesstype = preType;
             PreProcedure.PreAction = action;
+        }
+
+        /// <summary>
+        /// 设置测速
+        /// </summary>
+        /// <param name="benchmarkAct">测速方法（提供信息给此方法）</param>
+        /// <param name="benchmarkType">测速模式</param>
+        public static void SetBenchmark(Action<string> benchmarkAct, BenchmarkType benchmarkType = BenchmarkType.Simple)
+        {
+            BenchmarkSettingInfo.Type = benchmarkType;
+            BenchmarkSettingInfo.BenchmarkAction = benchmarkAct;
         }
     }
 }

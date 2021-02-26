@@ -64,7 +64,7 @@ namespace TestModel
         /// <summary>
         /// 岗位
         /// </summary>
-        public int? station { get; set; }
+        public string station { get; set; }
     }
 
 }

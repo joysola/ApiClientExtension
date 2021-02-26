@@ -52,6 +52,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestApi\ReportApi.cs" />
+    <Compile Include="TestApi\SampleCodeApi.cs" />
     <Compile Include="TestApi\TestApi.cs" />
   </ItemGroup>
   <ItemGroup>
