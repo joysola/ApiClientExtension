@@ -74,10 +74,10 @@
         </member>
         <member name="M:HttpClientExtension.ApiClient.HttpClientEx.SetBenchmark(System.Action{System.String},HttpClientExtension.Model.BenchmarkType)">
             <summary>
-            
+            设置测速
             </summary>
-            <param name="benchmarkAct"></param>
-            <param name="benchmarkType"></param>
+            <param name="benchmarkAct">测速方法（提供信息给此方法）</param>
+            <param name="benchmarkType">测速模式</param>
         </member>
         <member name="T:HttpClientExtension.Attribute.BaseHttpAttribute">
             <summary>
