@@ -61,10 +61,10 @@ namespace TestFrameworkClient
             }, HttpClientExtension.Model.BenchmarkType.Detail);
             for (int i = 0; i < 5; i++)
             {
-                Task.Run(() =>
-                {
-                    LoginApi.Client.Login(new QueryLoginModel { username = "13115011709", password = "123456" });
-                });
+                //Task.Run(() =>
+                //{
+                var xx = LoginApi.Client.Login(new QueryLoginModel { username = "13115011709", password = "123456" });
+                //});
             }
             Console.ReadKey();
             //HttpClientEx.SetCustomRequestHead("deepsight-auth", $"{d1.data.token_type} {d1.data.access_token}");

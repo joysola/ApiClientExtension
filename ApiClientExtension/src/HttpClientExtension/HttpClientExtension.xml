@@ -145,12 +145,11 @@
             <param name="url"></param>
             <returns></returns>
         </member>
-        <member name="M:HttpClientExtension.Attribute.BaseHttpAttribute.BuildSetbaseResultAction(System.Object,System.Object)">
+        <member name="M:HttpClientExtension.Attribute.BaseHttpAttribute.BuildSetbaseResultAction(System.Object)">
             <summary>
             生成给instance（父类）的baseResult赋值的action
             </summary>
             <param name="instance"></param>
-            <param name="result"></param>
         </member>
         <member name="M:HttpClientExtension.Attribute.BaseHttpAttribute.SetbaseResult(System.Object,System.Object)">
             <summary>
@@ -158,6 +157,14 @@
             </summary>
             <param name="instance"></param>
             <param name="result"></param>
+        </member>
+        <member name="M:HttpClientExtension.Attribute.BaseHttpAttribute.SetbaseResult(System.Object,System.Object,System.Type)">
+            <summary>
+            instance（父类）的baseResult赋值
+            </summary>
+            <param name="instance"></param>
+            <param name="result"></param>
+            <param name="type">返回类型</param>
         </member>
         <member name="M:HttpClientExtension.Attribute.BaseHttpAttribute.BuildGetAttribute``1">
             <summary>

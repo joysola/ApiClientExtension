@@ -158,14 +158,14 @@ namespace HttpClientExtension.Attribute
                         dynamic result = JsonConvert.DeserializeObject(json, rtype.GenericTypeArguments[0]);
                         //var result = Convert.ChangeType(zzz.data, rtype.GenericTypeArguments[0]);
                         var taskResult = Task.FromResult(result); // 结果装入Task
-                        SetbaseResult(instance, taskResult);
+                        SetbaseResult(instance, taskResult, rtype.GenericTypeArguments[0]);
                         //baseResult.SetValue(ins, taskResult, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
                     }
                     else // 同步
                     {
                         dynamic result = JsonConvert.DeserializeObject(json, rtype);
                         //baseResult.SetValue(ins, result, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
-                        SetbaseResult(instance, result);
+                        SetbaseResult(instance, result, rtype);
                     }
                 }
                 catch (Exception ex)
@@ -221,8 +221,7 @@ namespace HttpClientExtension.Attribute
         /// 生成给instance（父类）的baseResult赋值的action
         /// </summary>
         /// <param name="instance"></param>
-        /// <param name="result"></param>
-        private Action<object, dynamic> BuildSetbaseResultAction(object instance, dynamic result)
+        private Action<object, dynamic> BuildSetbaseResultAction(object instance/*, dynamic result*/)
         {
             var insType = instance.GetType();
             Action<object, dynamic> action = null;
@@ -259,8 +258,26 @@ namespace HttpClientExtension.Attribute
         /// <param name="result"></param>
         private void SetbaseResult(object instance, dynamic result)
         {
-            var action = BuildSetbaseResultAction(instance, result);
+            var action = BuildSetbaseResultAction(instance/*, result*/);
             action(instance, result);
+        }
+        /// <summary>
+        /// instance（父类）的baseResult赋值
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="result"></param>
+        /// <param name="type">返回类型</param>
+        private void SetbaseResult(object instance, dynamic result, Type type)
+        {
+            var action = BuildSetbaseResultAction(instance/*, result*/);
+            if (result == null) // 若result（反序列化结果为null，则返回type类型默认实例）
+            {
+                action(instance, Activator.CreateInstance(type));
+            }
+            else
+            {
+                action(instance, result);
+            }
         }
         /// <summary>
         /// 构造ParameterInfo的GetAttribute方法的表达式树
