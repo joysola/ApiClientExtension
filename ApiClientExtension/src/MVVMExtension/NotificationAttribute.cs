@@ -22,9 +22,13 @@ namespace MVVMExtension
         [Advice(Kind.After, Targets = Target.Public | Target.Setter)]
         public void AfterSetter([Argument(Source.Instance)] object sender, [Argument(Source.Name)] string propertyName)
         {
-            if (sender is ViewModelBase)
+            if (sender is ViewModelBase viewModel) // 针对viewmodel
             {
-                (sender as ViewModelBase).RaisePropertyChanged(propertyName);
+                viewModel.RaisePropertyChanged(propertyName);
+            }
+            else if (sender is ObservableObject observeObj) // 针对实体
+            {
+                observeObj.RaisePropertyChanged(propertyName);
             }
         }
     }
