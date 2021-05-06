@@ -214,7 +214,7 @@ namespace HttpClientExtension.Attribute
             catch (Exception ex)
             {
                 //Logger.Error("ApiGet方法出错！", ex);
-                throw new HttpClientException($"WebApi访问失败！{ex.InnerException.Message}", ex);
+                throw new HttpClientException($"WebApi访问失败！{ex.InnerException?.Message}", ex);
             }
         }
         /// <summary>
