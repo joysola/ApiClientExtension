@@ -1,4 +1,5 @@
-﻿using HttpClientExtension.Helper;
+﻿using HttpClientExtension.Exceptions;
+using HttpClientExtension.Helper;
 using HttpClientExtension.Model;
 using System;
 using System.Collections.Concurrent;
@@ -48,6 +49,10 @@ namespace HttpClientExtension.ApiClient
             //}
             _singleton = new HttpClient();
             _singleton.Timeout = TimeSpan.FromMilliseconds(5000);
+            if (string.IsNullOrEmpty(url)) // 未配置Api地址则停止
+            {
+                throw new HttpClientException("请配置Api地址！");
+            }
             _singleton.BaseAddress = new Uri(url);
             Monitor.Exit(locker);
         }
