@@ -12,22 +12,23 @@ namespace HttpClientExtension.Helper
         /// <summary>
         /// 格式化字符串
         /// </summary>
-        string parmFormat = "方法名:{0} 类型:{1} 参数:{2} ";
+        string parmFormat = "方法名:{0} 类型:{1} Url:{2} 其他:{3} ";
         /// <summary>
         /// 开始测速
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="arguments"></param>
         /// <param name="type"></param>
         /// <param name="instance"></param>
-        internal void BeginBenchmark(string name, Type type, object instance, params object[] arguments)
+        /// <param name="url"></param>
+        /// <param name="arguments"></param>
+        internal void BeginBenchmark(string name, Type type, object instance, string url, params object[] arguments)
         {
             if (HttpClientEx.BenchmarkSettingInfo.Type == BenchmarkType.None)
             {
                 return;
             }
-            var url = arguments.Length > 0 ? arguments[0].ToString() : string.Empty;
-            string desc = string.Format(parmFormat, name, type.Name, url);// $"方法名:{name} 类型:{type.Name}  {url} ";
+            var others = arguments.Length > 0 ? string.Join(";", arguments) : string.Empty;
+            string desc = string.Format(parmFormat, name, type.Name, url, others);// $"方法名:{name} 类型:{type.Name}  {url} ";
             switch (HttpClientEx.BenchmarkSettingInfo.Type)
             {
                 case BenchmarkType.Simple:
@@ -43,22 +44,22 @@ namespace HttpClientExtension.Helper
                     break;
             }
         }
-
         /// <summary>
         /// 测速终止
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="arguments"></param>
         /// <param name="type"></param>
         /// <param name="instance"></param>
-        internal void EndBenchmark(string name, Type type, object instance, params object[] arguments)
+        /// <param name="url"></param>
+        /// <param name="arguments"></param>
+        internal void EndBenchmark(string name, Type type, object instance, string url, params object[] arguments)
         {
             if (HttpClientEx.BenchmarkSettingInfo.Type == BenchmarkType.None)
             {
                 return;
             }
-            var url = arguments.Length > 0 ? arguments[0].ToString() : string.Empty;
-            string desc = string.Format(parmFormat, name, type.Name, url);
+            var others = arguments.Length > 0 ? string.Join(";", arguments) : string.Empty;
+            string desc = string.Format(parmFormat, name, type.Name, url, others);
             switch (HttpClientEx.BenchmarkSettingInfo.Type)
             {
                 case BenchmarkType.Simple:

@@ -314,23 +314,25 @@
             格式化字符串
             </summary>
         </member>
-        <member name="M:HttpClientExtension.Helper.BenchmarkHelper.BeginBenchmark(System.String,System.Type,System.Object,System.Object[])">
+        <member name="M:HttpClientExtension.Helper.BenchmarkHelper.BeginBenchmark(System.String,System.Type,System.Object,System.String,System.Object[])">
             <summary>
             开始测速
             </summary>
             <param name="name"></param>
-            <param name="arguments"></param>
             <param name="type"></param>
             <param name="instance"></param>
+            <param name="url"></param>
+            <param name="arguments"></param>
         </member>
-        <member name="M:HttpClientExtension.Helper.BenchmarkHelper.EndBenchmark(System.String,System.Type,System.Object,System.Object[])">
+        <member name="M:HttpClientExtension.Helper.BenchmarkHelper.EndBenchmark(System.String,System.Type,System.Object,System.String,System.Object[])">
             <summary>
             测速终止
             </summary>
             <param name="name"></param>
-            <param name="arguments"></param>
             <param name="type"></param>
             <param name="instance"></param>
+            <param name="url"></param>
+            <param name="arguments"></param>
         </member>
         <member name="M:HttpClientExtension.Helper.OSHelper.GetOSFriendlyName">
             <summary>

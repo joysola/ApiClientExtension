@@ -79,9 +79,9 @@ namespace HttpClientExtension.Attribute
             var url = urlResult.Url;
             var postcontent = JsonConvert.SerializeObject(urlResult.PostModel); // 序列化需要发送的post实体
             var content = new StringContent(postcontent, Encoding.UTF8, "application/json"); // 必须带上encode和media-type
-            BenchmarkHelper.Instance.BeginBenchmark(name, type, instance, url);
+            BenchmarkHelper.Instance.BeginBenchmark(name, type, instance, url, postcontent);
             var postResponse = base.Post(url, content);//DSTApiClient.Singleton.PostAsync(url, content).ConfigureAwait(false).GetAwaiter().GetResult(); // post方法获取数据
-            BenchmarkHelper.Instance.EndBenchmark(name, type, instance, url);
+            BenchmarkHelper.Instance.EndBenchmark(name, type, instance, url, postcontent);
             base.SetResultData(postResponse, instance, rtype);// 设置数据
             return target(arguments);
         }

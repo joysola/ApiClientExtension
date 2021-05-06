@@ -54,7 +54,7 @@ namespace TestFrameworkClient
             // 测试中台
             //ServicePointManager.Expect100Continue = true;
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-            HttpClientEx.InitApiClient("http://192.168.101.54:9527/");
+            HttpClientEx.InitApiClient("https://test-sz.deepsight.cloud/");
             HttpClientEx.SetTimeout(100000000);
             HttpClientEx.SetBenchmark(desc =>
             {
