@@ -54,18 +54,19 @@ namespace TestFrameworkClient
             // 测试中台
             //ServicePointManager.Expect100Continue = true;
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-            HttpClientEx.InitApiClient("https://test-sz.deepsight.cloud/");
+            HttpClientEx.InitApiClient("http://192.168.101.54:9527/");
+            HttpClientEx.SetTimeout(100000000);
             HttpClientEx.SetBenchmark(desc =>
             {
                 Console.WriteLine(desc);
             }, HttpClientExtension.Model.BenchmarkType.Detail);
-            for (int i = 0; i < 5; i++)
-            {
-                //Task.Run(() =>
-                //{
-                var xx = LoginApi.Client.Login(new QueryLoginModel { username = "13115011709", password = "123456" });
-                //});
-            }
+            //for (int i = 0; i < 5; i++)
+            //{
+            //Task.Run(() =>
+            //{"{\"username\":\"joysola\",\"password\":\"123456\"}"
+            var xx = LoginApi.Client.Login(new QueryLoginModel { username = "joysola", password = "123456" });
+            //});
+            //}
             Console.ReadKey();
             //HttpClientEx.SetCustomRequestHead("deepsight-auth", $"{d1.data.token_type} {d1.data.access_token}");
             //var d2 = DictApi.Client.GetDict("sex");
