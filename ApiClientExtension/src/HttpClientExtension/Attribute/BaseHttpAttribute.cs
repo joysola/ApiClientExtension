@@ -82,6 +82,10 @@ namespace HttpClientExtension.Attribute
         {
             var urlAttribute = methodBase.GetCustomAttribute<UrlAttribute>();
             var baseUrl = urlAttribute.Url; // 请求地址
+            if (string.IsNullOrEmpty(baseUrl)) // 为配置Api地址则停止
+            {
+                throw new HttpClientException("请配置Api地址！");
+            }
             object postModel = null; // post实体
             // 构建完整url
             var parameters = methodBase.GetParameters();
