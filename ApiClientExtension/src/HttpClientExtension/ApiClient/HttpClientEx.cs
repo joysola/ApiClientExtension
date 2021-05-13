@@ -33,8 +33,9 @@ namespace HttpClientExtension.ApiClient
         /// <summary>
         /// 用于更改Url
         /// </summary>
-        /// <param name="url"></param>
-        public static void InitApiClient(string url)
+        /// <param name="url">baseurl地址</param>
+        /// <param name="handlerEnum">httpclient的HttpMessageHandler的选择</param>
+        public static void InitApiClient(string url, HttpHandlerEnum handlerEnum = HttpHandlerEnum.Default)
         {
             Monitor.Enter(locker);
             if (_singleton != null)
@@ -42,12 +43,18 @@ namespace HttpClientExtension.ApiClient
                 _singleton.Dispose();
                 _singleton = null;
             }
-            //if (OSHelper.IsOSLowThanWin10())
-            //{
-            //ServicePointManager.Expect100Continue = true;
-            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            //}
-            _singleton = new HttpClient();
+            // 选择 httpclient的HttpMessageHandler
+            switch (handlerEnum)
+            {
+                case HttpHandlerEnum.WinHttpHandler: // 是否启用 WinHttpHandler
+                    _singleton = new HttpClient(new WinHttpHandler());
+                    break;
+                case HttpHandlerEnum.Default: // 默认
+                default:
+                    _singleton = new HttpClient();
+                    break;
+            }
+
             _singleton.Timeout = TimeSpan.FromMilliseconds(5000);
             if (string.IsNullOrEmpty(url)) // 未配置Api地址则停止
             {

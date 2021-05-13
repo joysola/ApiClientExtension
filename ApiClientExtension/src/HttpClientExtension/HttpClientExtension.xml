@@ -46,11 +46,12 @@
             测速配置
             </summary>
         </member>
-        <member name="M:HttpClientExtension.ApiClient.HttpClientEx.InitApiClient(System.String)">
+        <member name="M:HttpClientExtension.ApiClient.HttpClientEx.InitApiClient(System.String,HttpClientExtension.Model.HttpHandlerEnum)">
             <summary>
             用于更改Url
             </summary>
-            <param name="url"></param>
+            <param name="url">baseurl地址</param>
+            <param name="handlerEnum">httpclient的HttpMessageHandler的选择</param>
         </member>
         <member name="M:HttpClientExtension.ApiClient.HttpClientEx.SetCustomRequestHead(System.String,System.String)">
             <summary>
@@ -411,6 +412,21 @@
         <member name="P:HttpClientExtension.Model.Benchmark.Desc">
             <summary>
             描述信息
+            </summary>
+        </member>
+        <member name="T:HttpClientExtension.Model.HttpHandlerEnum">
+            <summary>
+            httpclient的HttpMessageHandler的选择
+            </summary>
+        </member>
+        <member name="F:HttpClientExtension.Model.HttpHandlerEnum.Default">
+            <summary>
+            默认
+            </summary>
+        </member>
+        <member name="F:HttpClientExtension.Model.HttpHandlerEnum.WinHttpHandler">
+            <summary>
+            使用WinHttpHandler(可能可以避免某些无法连接)
             </summary>
         </member>
         <member name="T:HttpClientExtension.Model.PreProcess">
