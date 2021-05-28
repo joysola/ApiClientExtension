@@ -112,11 +112,11 @@ namespace HttpClientExtension.Attribute
                     // 判断Url参数是否需要改名字
                     if (parNameAttr != null)
                     {
-                        dict.Add(new KeyValuePair<string, object>(parNameAttr.ParamName, arguments[i]));
+                        dict.Add(new KeyValuePair<string, object>(parNameAttr.ParamName, arguments[i] ?? string.Empty));
                     }
                     else
                     {
-                        dict.Add(new KeyValuePair<string, object>(parameters[i].Name, arguments[i]));
+                        dict.Add(new KeyValuePair<string, object>(parameters[i].Name, arguments[i] ?? string.Empty));
                     }
                 }
             }
@@ -314,7 +314,7 @@ namespace HttpClientExtension.Attribute
             var resList = new List<string>();
             foreach (var kp in list)
             {
-                var toStringType = getToStringType.Value(kp.Value);
+                var toStringType = getToStringType.Value(kp.Value); // 如果value是null，则默认空值
                 if (toStringType == typeof(object)) // 未重载toString方法，跳过
                 {
                     continue;

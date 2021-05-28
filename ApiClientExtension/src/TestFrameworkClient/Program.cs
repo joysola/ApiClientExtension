@@ -64,7 +64,7 @@ namespace TestFrameworkClient
             //{
             //Task.Run(() =>
             //{"{\"username\":\"joysola\",\"password\":\"123456\"}"
-            var xx = LoginApi.Client.Login(new QueryLoginModel { username = "joysola", password = "123456" });
+            var xx = LoginApi.Client.Login(new QueryLoginModel { username = "joysola", password = "123456" }, null);
             //});
             //}
             Console.ReadKey();

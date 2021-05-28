@@ -23,6 +23,6 @@ namespace TestFrameworkClient
         /// <returns></returns>
         [Url("api/deepsight-auth/oauth/login")]
         [HttpPost]
-        public ApiResponse<LoginModel> Login([PostContent] QueryLoginModel postLoginModel) => GetResult();
+        public ApiResponse<LoginModel> Login([PostContent] QueryLoginModel postLoginModel,string xxx) => GetResult();
     }
 }
