@@ -13,6 +13,7 @@ using System.Linq.Expressions;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using System.Threading;
+using HttpClientExtension.Model;
 
 namespace HttpClientExtension.Attribute
 {
@@ -123,7 +124,7 @@ namespace HttpClientExtension.Attribute
                 //paramUrl = $"?{string.Join("&", paramUrlArray)}";
                 paramUrl = this.GetUrlParam(dict);
             }
-            var url = $"{baseUrl}{paramUrl}";
+            var url = $"{(urlAttribute.UrlType == UrlEnum.Normal ? HttpClientEx.BaseUrl : string.Empty)}{baseUrl}{paramUrl}";
             return new UrlResult { Url = url, PostModel = postModel };
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HttpClientExtension.Model;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,20 +13,24 @@ namespace HttpClientExtension.Attribute
     {
 
         readonly string _url;
+        readonly UrlEnum _urlEnum;
         /// <summary>
         /// 构造器，获取url
         /// </summary>
-        /// <param name="url"></param>
-        public UrlAttribute(string url)
+        /// <param name="url">地址</param>
+        /// <param name="urlType">地址类型</param>
+        public UrlAttribute(string url, UrlEnum urlType = UrlEnum.Normal)
         {
             this._url = url;
+            this._urlEnum = urlType;
         }
         /// <summary>
         /// 返回url
         /// </summary>
-        public string Url
-        {
-            get { return _url; }
-        }
+        public string Url => _url;
+        /// <summary>
+        /// url类型
+        /// </summary>
+        public UrlEnum UrlType => _urlEnum;
     }
 }

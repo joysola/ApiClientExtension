@@ -85,7 +85,7 @@ namespace TestFrameworkClient
             //}
 
 
-            HttpClientEx.InitApiClient("https://dst-sz.deepsight.cloud/api/",HttpClientExtension.Model.HttpHandlerEnum.WinHttpHandler);
+            HttpClientEx.InitApiClient("https://dst-sz.deepsight.cloud/api/", HttpClientExtension.Model.HttpHandlerEnum.WinHttpHandler);
             HttpClientEx.SetTimeout(100000000);
             HttpClientEx.SetBenchmark(desc =>
             {
@@ -113,6 +113,9 @@ namespace TestFrameworkClient
                     stream.CopyTo(fileStream);
                 }
             }
+
+            var newurl = DownloadApi.Client.GetSampleUpload("1408623205882531842", "20210510");
+            var login22 = LoginApi.Client.Login(new QueryLoginModel { username = "汝阳县妇幼保健院", password = "123456" });
             Console.ReadKey();
 
             Console.ReadLine();

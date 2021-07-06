@@ -1,11 +1,13 @@
 ﻿using HttpClientExtension.ApiClient;
 using HttpClientExtension.Attribute;
+using HttpClientExtension.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using TestModel;
 
 namespace TestFrameworkClient
 {
@@ -18,5 +20,11 @@ namespace TestFrameworkClient
         [Url("dst-fund/fund/product-area-price/exportProductAreaPriceTemplate")]
         [HttpPost]
         public Task<HttpResponseMessage> GetDownloadInfo2([PostContent] object xxx) => GetResult();
+
+
+        [Url("https://upload1.spt.deepsight.cloud/samplemincloud/search/index/", UrlEnum.Full)]
+        [HttpGet]
+        public SampleUploadReturn GetSampleUpload(string file_path, string sample_path) => GetResult();
     }
+
 }

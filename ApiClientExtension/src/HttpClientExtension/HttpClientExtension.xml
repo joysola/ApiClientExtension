@@ -314,15 +314,21 @@
             url特性用于获取api地址
             </summary>
         </member>
-        <member name="M:HttpClientExtension.Attribute.UrlAttribute.#ctor(System.String)">
+        <member name="M:HttpClientExtension.Attribute.UrlAttribute.#ctor(System.String,HttpClientExtension.Model.UrlEnum)">
             <summary>
             构造器，获取url
             </summary>
-            <param name="url"></param>
+            <param name="url">地址</param>
+            <param name="urlType">地址类型</param>
         </member>
         <member name="P:HttpClientExtension.Attribute.UrlAttribute.Url">
             <summary>
             返回url
+            </summary>
+        </member>
+        <member name="P:HttpClientExtension.Attribute.UrlAttribute.UrlType">
+            <summary>
+            url类型
             </summary>
         </member>
         <member name="T:HttpClientExtension.Exceptions.HttpClientException">
@@ -446,6 +452,36 @@
             描述信息
             </summary>
         </member>
+        <member name="T:HttpClientExtension.Model.HttpHandlerEnum">
+            <summary>
+            httpclient的HttpMessageHandler的选择
+            </summary>
+        </member>
+        <member name="F:HttpClientExtension.Model.HttpHandlerEnum.Default">
+            <summary>
+            默认
+            </summary>
+        </member>
+        <member name="F:HttpClientExtension.Model.HttpHandlerEnum.WinHttpHandler">
+            <summary>
+            使用WinHttpHandler(可能可以避免某些无法连接)
+            </summary>
+        </member>
+        <member name="T:HttpClientExtension.Model.UrlEnum">
+            <summary>
+            Url特性的枚举
+            </summary>
+        </member>
+        <member name="F:HttpClientExtension.Model.UrlEnum.Normal">
+            <summary>
+            普通地址（即配置了BaseUrl）
+            </summary>
+        </member>
+        <member name="F:HttpClientExtension.Model.UrlEnum.Full">
+            <summary>
+            完整地址（会忽略配置的BaseUrl）
+            </summary>
+        </member>
         <member name="T:HttpClientExtension.Model.FileDownload">
             <summary>
             下载文件实体
@@ -464,21 +500,6 @@
         <member name="P:HttpClientExtension.Model.FileDownload.ContentDispositionHeader">
             <summary>
             Content-Disposition header信息
-            </summary>
-        </member>
-        <member name="T:HttpClientExtension.Model.HttpHandlerEnum">
-            <summary>
-            httpclient的HttpMessageHandler的选择
-            </summary>
-        </member>
-        <member name="F:HttpClientExtension.Model.HttpHandlerEnum.Default">
-            <summary>
-            默认
-            </summary>
-        </member>
-        <member name="F:HttpClientExtension.Model.HttpHandlerEnum.WinHttpHandler">
-            <summary>
-            使用WinHttpHandler(可能可以避免某些无法连接)
             </summary>
         </member>
         <member name="T:HttpClientExtension.Model.PreProcess">

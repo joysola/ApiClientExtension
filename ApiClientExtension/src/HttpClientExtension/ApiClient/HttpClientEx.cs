@@ -18,6 +18,22 @@ namespace HttpClientExtension.ApiClient
     {
         private static readonly object locker = new object();
         private static HttpClient _singleton;
+        private static string _baseUrl;
+        /// <summary>
+        /// 主要的Url，用于复用
+        /// </summary>
+        internal static string BaseUrl
+        {
+            get => _baseUrl;
+            set
+            {
+                _baseUrl = value;
+                if (!string.IsNullOrEmpty(_baseUrl)) // 地址结尾是否带有斜杠，没有自动补齐斜杠
+                {
+                    _baseUrl = _baseUrl.EndsWith("/") ? _baseUrl : $"{_baseUrl}/";
+                }
+            }
+        }
         /// <summary>
         /// 单例Httpclient
         /// </summary>
@@ -60,7 +76,8 @@ namespace HttpClientExtension.ApiClient
             {
                 throw new HttpClientException("请配置Api地址！");
             }
-            _singleton.BaseAddress = new Uri(url);
+            //_singleton.BaseAddress = new Uri(url);
+            BaseUrl = url;
             Monitor.Exit(locker);
         }
 
