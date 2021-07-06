@@ -1,11 +1,17 @@
 ﻿using HttpClientExtension.ApiClient;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using TestModel;
 
 namespace TestFrameworkClient
@@ -48,78 +54,67 @@ namespace TestFrameworkClient
             //}
             //var xx = SampleCodeApi.Client.GetSamplebyCode("222", sb.ToString());
 
+            //using (var client = new HttpClient(new WinHttpHandler()))
+            //{
+            //    client.BaseAddress = new Uri("https://dst-sz.deepsight.cloud/api/");
+            //    var loginModel = new QueryLoginModel { username = "汝阳县妇幼保健院", password = "123456" };
+            //    var postcontent = JsonConvert.SerializeObject(loginModel);
+            //    var content = new StringContent(postcontent, Encoding.UTF8, "application/json"); // 必须带上encode和media-type
+            //    var responseMessage = client.PostAsync("dst-auth/oauth/login", content).ConfigureAwait(false).GetAwaiter().GetResult();
+            //    var json = responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
+            //    var login = JsonConvert.DeserializeObject<ApiResponse<LoginModel>>(json);
+            //    var token = $"{login.data.token_type} {login.data.access_token}";
+            //    client.DefaultRequestHeaders.Add("deepsight-auth", token);
+            //    var httpResponse = client.PostAsync("dst-fund/fund/product-area-price/exportProductAreaPriceTemplate", new StringContent("{ \"areaPriceType\":0, \"productIdList\":[\"1395618831419121666\"], \"areaId\":\"11\"}", Encoding.UTF8, "application/json")).ConfigureAwait(false).GetAwaiter().GetResult();
+            //    var responssHeaders = httpResponse.Content.Headers;
+            //    var info = responssHeaders.ContentDisposition;
+            //    var fileName = info.FileName;
+            //    var trueFileName = HttpUtility.UrlDecode(fileName);
+            //    var xxxxxx = HttpUtility.UrlDecode("xaasda1312");
+            //    var trueFileName1 = HttpUtility.UrlDecode(fileName, Encoding.UTF8);
+            //    //var trueFileName2 = HttpUtility.UrlDecode(fileName,Encoding.ASCII);
+
+            //    using (var stream = httpResponse.Content.ReadAsStreamAsync().ConfigureAwait(false).GetAwaiter().GetResult())
+            //    {
+            //        var path = Directory.GetCurrentDirectory() + "\\" + trueFileName;
+            //        using (FileStream fileStream = new FileStream(path, FileMode.Create))
+            //        {
+            //            stream.CopyTo(fileStream);
+            //        }
+            //    }
+            //}
 
 
-
-            // 测试中台
-            //ServicePointManager.Expect100Continue = true;
-            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-            HttpClientEx.InitApiClient("https://test-sz.deepsight.cloud/");
+            HttpClientEx.InitApiClient("https://dst-sz.deepsight.cloud/api/",HttpClientExtension.Model.HttpHandlerEnum.WinHttpHandler);
             HttpClientEx.SetTimeout(100000000);
             HttpClientEx.SetBenchmark(desc =>
             {
                 Console.WriteLine(desc);
             }, HttpClientExtension.Model.BenchmarkType.Detail);
-            //for (int i = 0; i < 5; i++)
-            //{
-            //Task.Run(() =>
-            //{"{\"username\":\"joysola\",\"password\":\"123456\"}"
-            var xx = LoginApi.Client.Login(new QueryLoginModel { username = "joysola", password = "123456" }, null);
-            //});
-            //}
-            Console.ReadKey();
-            //HttpClientEx.SetCustomRequestHead("deepsight-auth", $"{d1.data.token_type} {d1.data.access_token}");
-            //var d2 = DictApi.Client.GetDict("sex");
-            //var d3 = DictApi.Client.GetDict("downFlag");
-            //var d4 = DictApi.Client.GetDict("checkProjectStatus");
-            //var d44 = DictApi.Client.GetDict("experimentStatus");
-            //var d5 = DictApi.Client.GetHotpitalInfo().GetAwaiter().GetResult();
-            //var d6 = DictApi.Client.GetSubmitDoctors();
-            //var d7 = DictApi.Client.GetProductModels();
-            //var postcontent2 = new MBPSampleModel
-            //{
-            //    id = "1339463229227384833",
-            //    barCode = "tmh",
-            //    clinicalManifestation = "lcbx2",
-            //    doctorId = "1338352644732379138",
-            //    gatherTime = DateTime.Now,
-            //    hospitalId = "1338352014932512770",
-            //    patentNumber = "blh",
-            //    patientAge = 5200,
-            //    patientName = "蔡文姬",
-            //    patientPhone = "110110",
-            //    patientSex = "1",
-            //    productId = "1233732841448943617",
-            //    productType = "",
-            //    remark = "bz"
-            //};
-            //var xx2 = MBPSampleApi.Client.SaveMBPSample(postcontent2);
-            //var postcontent3 = new QueryMBPSampleList
-            //{
-            //    code = "",
-            //    doctorId = "",
-            //    doctorName = "",
-            //    downFlag = null,
-            //    gatherTimeEnd = new DateTime(2020, 12, 17),
-            //    gatherTimeStart = new DateTime(2010, 1, 1),
-            //    patientName = "",
-            //    productIdList = null,
-            //    queryAgeMax = null,
-            //    queryAgeMin = null,
-            //    reportTimeEnd = null,
-            //    reportTimeStart = null,
-            //    status = "1"
-            //};
-            //var xx3 = MBPSampleApi.Client.GetMBPSamples(20, 1, postcontent3);
-            //var postcontent4 = new BackMBPSample
-            //{
-            //    chargeBackCause = "钱不够了，求退款",
-            //    id = "1339459973998690306"
-            //};
-            //var xx4 = MBPSampleService.Instance.BackMBPSample(postcontent4);
 
-            //var xx5 = ReportApi.Client.GetHPVReport("1241263542586396673"/*, "1233733366982651905"*/);
-            //var xx6 = ReportApi.Client.GetTissueReport("1340156218083418113"/*, "1317016574762799106"*/);
+            var login2 = LoginApi.Client.Login(new QueryLoginModel { username = "汝阳县妇幼保健院", password = "123456" });
+            var token2 = $"{login2.data.token_type} {login2.data.access_token}";
+            HttpClientEx.SetCustomRequestHead("deepsight-auth", token2);
+            var testobj = JsonConvert.DeserializeObject("{ \"areaPriceType\":0, \"productIdList\":[\"1395618831419121666\"], \"areaId\":\"11\"}");
+            var downresult = DownloadApi.Client.GetDownloadInfo2(testobj).ConfigureAwait(false).GetAwaiter().GetResult();
+            var responsHeaders = downresult.Content.Headers;
+            var info = responsHeaders.ContentDisposition;
+            var fileName = info.FileName;
+            var trueFileName = HttpUtility.UrlDecode(fileName);
+            var xxxxxx = HttpUtility.UrlDecode("xaasda1312");
+            var trueFileName1 = HttpUtility.UrlDecode(fileName, Encoding.UTF8);
+            //var trueFileName2 = HttpUtility.UrlDecode(fileName,Encoding.ASCII);
+
+            using (var stream = downresult.Content.ReadAsStreamAsync().ConfigureAwait(false).GetAwaiter().GetResult())
+            {
+                var path = Directory.GetCurrentDirectory() + "\\" + trueFileName;
+                using (FileStream fileStream = new FileStream(path, FileMode.Create))
+                {
+                    stream.CopyTo(fileStream);
+                }
+            }
+            Console.ReadKey();
+
             Console.ReadLine();
         }
         static async Task Test()

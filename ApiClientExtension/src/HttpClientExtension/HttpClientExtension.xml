@@ -181,6 +181,38 @@
             <param name="list"></param>
             <returns></returns>
         </member>
+        <member name="M:HttpClientExtension.Attribute.BaseHttpAttribute.DeserializeJsonData(System.Net.Http.HttpResponseMessage,System.Object,System.Type)">
+            <summary>
+            反序列化json数据（核心）
+            </summary>
+            <param name="httpResponse"></param>
+            <param name="instance"></param>
+            <param name="rtype"></param>
+        </member>
+        <member name="M:HttpClientExtension.Attribute.BaseHttpAttribute.IsReturnHttpResponse(System.Net.Http.HttpResponseMessage,System.Object,System.Type)">
+            <summary>
+            判断返回类型是否是HttpResponseMessage，如果是，则处理它（返回它），不是，则进行json反序列化处理
+            </summary>
+            <param name="httpResponse">返回数据</param>
+            <param name="instance">实例</param>
+            <param name="rtype">返回类型</param>
+            <returns></returns>
+        </member>
+        <member name="T:HttpClientExtension.Attribute.FileDownloadAttribute">
+            <summary>
+            文件下载标签
+            </summary>
+        </member>
+        <member name="M:HttpClientExtension.Attribute.FileDownloadAttribute.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:HttpClientExtension.Attribute.FileDownloadAttribute.Encoding">
+            <summary>
+            编码方式(默认utf-8)
+            </summary>
+        </member>
         <member name="T:HttpClientExtension.Attribute.HttpGetAttribute">
             <summary>
             httpget请求特性
@@ -249,8 +281,8 @@
             </summary>
             <param name="name"></param>
             <param name="arguments"></param>
+            <param name="target"></param>
             <param name="instance"></param>
-            <param name="attrs"></param>
             <param name="type"></param>
             <param name="rtype"></param>
             <param name="methodBase"></param>
@@ -412,6 +444,26 @@
         <member name="P:HttpClientExtension.Model.Benchmark.Desc">
             <summary>
             描述信息
+            </summary>
+        </member>
+        <member name="T:HttpClientExtension.Model.FileDownload">
+            <summary>
+            下载文件实体
+            </summary>
+        </member>
+        <member name="P:HttpClientExtension.Model.FileDownload.Stream">
+            <summary>
+            文件流
+            </summary>
+        </member>
+        <member name="P:HttpClientExtension.Model.FileDownload.FileName">
+            <summary>
+            文件名
+            </summary>
+        </member>
+        <member name="P:HttpClientExtension.Model.FileDownload.ContentDispositionHeader">
+            <summary>
+            Content-Disposition header信息
             </summary>
         </member>
         <member name="T:HttpClientExtension.Model.HttpHandlerEnum">

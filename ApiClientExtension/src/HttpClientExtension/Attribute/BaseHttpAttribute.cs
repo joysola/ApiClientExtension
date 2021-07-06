@@ -53,10 +53,6 @@ namespace HttpClientExtension.Attribute
             return func;
         });
         private static readonly object locker = new object();
-        /// <summary>
-        /// 返回类型
-        /// </summary>
-        // public Type preApiType; //typeof(ApiResponse<>);
 
         /// <summary>
         /// url处理后的结果
@@ -139,43 +135,12 @@ namespace HttpClientExtension.Attribute
         /// <param name="rtype"></param>
         protected void SetResultData(HttpResponseMessage httpResponse, object instance, Type rtype)
         {
-            var msg = string.Empty;
+
             if (httpResponse.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                var json = httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
-                // 预判
-                if (HttpClientEx.PreProcedure.PreAction != null && HttpClientEx.PreProcedure.PreProcesstype != null)
+                if (!IsReturnHttpResponse(httpResponse, instance, rtype)) // 判断返回类型是否是HttpResponseMessage
                 {
-                    dynamic preResult = JsonConvert.DeserializeObject(json, HttpClientEx.PreProcedure.PreProcesstype);
-                    HttpClientEx.PreProcedure.PreAction(preResult); // 执行预判方法
-                }
-                //dynamic ins = instance; // 转成动态类型
-                //var baseResult = instance.GetType().BaseType.GetField("baseResult", BindingFlags.NonPublic | BindingFlags.Instance); // 获取BaseResult属性（父类中）
-                //if (baseResult == null)
-                //{
-                //    throw new HttpClientException("GetResult方法获取对应字段失败！");
-                //}
-                try
-                {
-                    if (rtype.IsGenericType && rtype.GetGenericTypeDefinition() == typeof(Task<>)) // 异步
-                    {
-                        dynamic result = JsonConvert.DeserializeObject(json, rtype.GenericTypeArguments[0]);
-                        //var result = Convert.ChangeType(zzz.data, rtype.GenericTypeArguments[0]);
-                        var taskResult = Task.FromResult(result); // 结果装入Task
-                        SetbaseResult(instance, taskResult, rtype.GenericTypeArguments[0]);
-                        //baseResult.SetValue(ins, taskResult, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
-                    }
-                    else // 同步
-                    {
-                        dynamic result = JsonConvert.DeserializeObject(json, rtype);
-                        //baseResult.SetValue(ins, result, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
-                        SetbaseResult(instance, result, rtype);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //Logger.Error("HttpBase出错！", ex);
-                    throw;
+                    DeserializeJsonData(httpResponse, instance, rtype);
                 }
             }
             else
@@ -327,6 +292,78 @@ namespace HttpClientExtension.Attribute
             var paramUrlArray = resList.ToArray();
             var paramUrl = $"?{string.Join("&", paramUrlArray)}";
             return paramUrl;
+        }
+
+        /// <summary>
+        /// 反序列化json数据（核心）
+        /// </summary>
+        /// <param name="httpResponse"></param>
+        /// <param name="instance"></param>
+        /// <param name="rtype"></param>
+        private void DeserializeJsonData(HttpResponseMessage httpResponse, object instance, Type rtype)
+        {
+            var json = httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
+                                                                                                                // 预判
+            if (HttpClientEx.PreProcedure.PreAction != null && HttpClientEx.PreProcedure.PreProcesstype != null)
+            {
+                dynamic preResult = JsonConvert.DeserializeObject(json, HttpClientEx.PreProcedure.PreProcesstype);
+                HttpClientEx.PreProcedure.PreAction(preResult); // 执行预判方法
+            }
+            //dynamic ins = instance; // 转成动态类型
+            //var baseResult = instance.GetType().BaseType.GetField("baseResult", BindingFlags.NonPublic | BindingFlags.Instance); // 获取BaseResult属性（父类中）
+            //if (baseResult == null)
+            //{
+            //    throw new HttpClientException("GetResult方法获取对应字段失败！");
+            //}
+            try
+            {
+                if (rtype.IsGenericType && rtype.GetGenericTypeDefinition() == typeof(Task<>)) // 异步
+                {
+                    dynamic result = JsonConvert.DeserializeObject(json, rtype.GenericTypeArguments[0]);
+                    //var result = Convert.ChangeType(zzz.data, rtype.GenericTypeArguments[0]);
+                    var taskResult = Task.FromResult(result); // 结果装入Task
+                    SetbaseResult(instance, taskResult, rtype.GenericTypeArguments[0]);
+                    //baseResult.SetValue(ins, taskResult, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
+                }
+                else // 同步
+                {
+                    dynamic result = JsonConvert.DeserializeObject(json, rtype);
+                    //baseResult.SetValue(ins, result, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
+                    SetbaseResult(instance, result, rtype);
+                }
+            }
+            catch (Exception ex)
+            {
+                //Logger.Error("HttpBase出错！", ex);
+                throw;
+            }
+        }
+        /// <summary>
+        /// 判断返回类型是否是HttpResponseMessage，如果是，则处理它（返回它），不是，则进行json反序列化处理
+        /// </summary>
+        /// <param name="httpResponse">返回数据</param>
+        /// <param name="instance">实例</param>
+        /// <param name="rtype">返回类型</param>
+        /// <returns></returns>
+        private bool IsReturnHttpResponse(HttpResponseMessage httpResponse, object instance, Type rtype)
+        {
+            var res = false;
+            dynamic result = null;
+            if (rtype == typeof(HttpResponseMessage))
+            {
+                res = true;
+                result = httpResponse;
+            }
+            else if (rtype == typeof(Task<HttpResponseMessage>))
+            {
+                res = true;
+                result = Task.FromResult(httpResponse); // 结果装入Task
+            }
+            if (result != null)
+            {
+                SetbaseResult(instance, result, rtype);
+            }
+            return res;
         }
     }
 }

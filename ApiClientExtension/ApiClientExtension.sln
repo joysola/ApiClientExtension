@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestFrameworkbyDLL", "src\T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestClientbyDLL", "src\TestClientbyDLL\TestClientbyDLL.csproj", "{16097AE9-5FA4-48B2-90C2-8E543B785860}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVVMExtension", "src\MVVMExtension\MVVMExtension.csproj", "{40645470-3898-4D22-8F9C-9D4B853E2CCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVVMExtension", "src\MVVMExtension\MVVMExtension.csproj", "{40645470-3898-4D22-8F9C-9D4B853E2CCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

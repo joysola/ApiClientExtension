@@ -58,8 +58,8 @@ namespace HttpClientExtension.Attribute
         /// </summary>
         /// <param name="name"></param>
         /// <param name="arguments"></param>
+        /// <param name="target"></param>
         /// <param name="instance"></param>
-        /// <param name="attrs"></param>
         /// <param name="type"></param>
         /// <param name="rtype"></param>
         /// <param name="methodBase"></param>
