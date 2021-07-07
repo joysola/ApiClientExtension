@@ -115,6 +115,7 @@ namespace TestFrameworkClient
             }
 
             var newurl = DownloadApi.Client.GetSampleUpload("1408623205882531842", "20210510");
+            var newurl2 = DownloadApi.Client.GetSampleUpload2("1408623205882531842", "20210510");
             var login22 = LoginApi.Client.Login(new QueryLoginModel { username = "汝阳县妇幼保健院", password = "123456" });
             Console.ReadKey();
 

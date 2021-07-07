@@ -31,6 +31,11 @@
             HttpClient客户端
             </summary>
         </member>
+        <member name="P:HttpClientExtension.ApiClient.HttpClientEx.BaseUrl">
+            <summary>
+            主要的Url，用于复用
+            </summary>
+        </member>
         <member name="P:HttpClientExtension.ApiClient.HttpClientEx.Singleton">
             <summary>
             单例Httpclient
@@ -321,6 +326,13 @@
             <param name="url">地址</param>
             <param name="urlType">地址类型</param>
         </member>
+        <member name="M:HttpClientExtension.Attribute.UrlAttribute.#ctor(System.String,System.String)">
+            <summary>
+            构造器，获取完整Url（默认 使用 UrlEnum.Full）
+            </summary>
+            <param name="routeUrl">路由地址</param>
+            <param name="baseUrl">基础地址</param>
+        </member>
         <member name="P:HttpClientExtension.Attribute.UrlAttribute.Url">
             <summary>
             返回url
@@ -474,7 +486,7 @@
         </member>
         <member name="F:HttpClientExtension.Model.UrlEnum.Normal">
             <summary>
-            普通地址（即配置了BaseUrl）
+            普通地址（即配置了HttpClientEx的BaseUrl后使用）
             </summary>
         </member>
         <member name="F:HttpClientExtension.Model.UrlEnum.Full">
