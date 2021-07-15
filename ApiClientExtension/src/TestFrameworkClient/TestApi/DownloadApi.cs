@@ -25,9 +25,13 @@ namespace TestFrameworkClient
         [Url("https://upload.spt.deepsight.cloud/sample/mincloud/search/index/", UrlEnum.Full)]
         [HttpGet]
         public SampleUploadReturn GetSampleUpload(string file_path, string sample_path) => GetResult();
+
         [Url("https://upload.spt.deepsight.cloud", "/sample/mincloud/search/index/")]
         [HttpGet]
         public SampleUploadReturn GetSampleUpload2(string file_path, string sample_path) => GetResult();
+
+
+
     }
 
 }

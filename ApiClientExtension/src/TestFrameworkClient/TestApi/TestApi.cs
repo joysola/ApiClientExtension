@@ -35,5 +35,10 @@ namespace TestFrameworkClient
         [Url("api/Test/TestPost2")]
         [HttpPost]
         public TestMainModel TestPost2([ParamName("AA")] int aa, [ParamName("BBB")] bool bb, [PostContent] TestMainModel content) => GetResult();
+
+
+        [Url("http://192.168.101.62:15004/pathology/sample-fee-settlement/exportFeeSettlement",HttpClientExtension.Model.UrlEnum.Full)]
+        [HttpPost]
+        public ApiResponse<byte[]> Testdownload([PostContent] object xxx) => GetResult();
     }
 }

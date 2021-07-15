@@ -20,10 +20,6 @@ namespace HttpClientExtension.Attribute
     public sealed class HttpPostAttribute : BaseHttpAttribute
     {
         /// <summary>
-        /// 自定义请求头
-        /// </summary>
-        private readonly string customHeader = "deepsight-auth";
-        /// <summary>
         /// 调用前
         /// </summary>
         /// <param name="name"></param>
@@ -77,10 +73,19 @@ namespace HttpClientExtension.Attribute
         {
             var urlResult = base.GetUrl(arguments, methodBase);
             var url = urlResult.Url;
-            var postcontent = JsonConvert.SerializeObject(urlResult.PostModel); // 序列化需要发送的post实体
-            var content = new StringContent(postcontent, Encoding.UTF8, "application/json"); // 必须带上encode和media-type
+            HttpContent content = null; // post发送的httpcontent实体
+            var postcontent = string.Empty; // json格式时，发送的的post实体字符串
+            if (urlResult.PostModel is HttpContent httpContent) // 非json格式的HttpContent
+            {
+                content = httpContent;
+            }
+            else // 默认json格式StringContent
+            {
+                postcontent = JsonConvert.SerializeObject(urlResult.PostModel); // 序列化需要发送的post实体
+                content = new StringContent(postcontent, Encoding.UTF8, "application/json"); // 必须带上encode和media-type
+            }
             BenchmarkHelper.Instance.BeginBenchmark(name, type, instance, url, postcontent);
-            var postResponse = base.Post(url, content);//DSTApiClient.Singleton.PostAsync(url, content).ConfigureAwait(false).GetAwaiter().GetResult(); // post方法获取数据
+            var postResponse = base.Post(url, content); // post方法获取数据
             BenchmarkHelper.Instance.EndBenchmark(name, type, instance, url, postcontent);
             base.SetResultData(postResponse, instance, rtype);// 设置数据
             return target(arguments);

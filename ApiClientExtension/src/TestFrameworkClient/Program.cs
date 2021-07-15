@@ -92,6 +92,15 @@ namespace TestFrameworkClient
                 Console.WriteLine(desc);
             }, HttpClientExtension.Model.BenchmarkType.Detail);
 
+            var aaa = TestApi.Client.Testdownload(new object());
+            var bytes = aaa.data;//Encoding.UTF8.GetBytes(aaa.data);
+
+            var path2 = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + $"\\{DateTime.Now:yyyyMMddHHmmssms}.xlsx";
+            using (FileStream fileStream = new FileStream(path2, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, bytes.Length, FileOptions.Asynchronous))
+            {
+                fileStream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false).GetAwaiter().GetResult();
+            }
+
             var login2 = LoginApi.Client.Login(new QueryLoginModel { username = "汝阳县妇幼保健院", password = "123456" });
             var token2 = $"{login2.data.token_type} {login2.data.access_token}";
             HttpClientEx.SetCustomRequestHead("deepsight-auth", token2);
@@ -101,7 +110,6 @@ namespace TestFrameworkClient
             var info = responsHeaders.ContentDisposition;
             var fileName = info.FileName;
             var trueFileName = HttpUtility.UrlDecode(fileName);
-            var xxxxxx = HttpUtility.UrlDecode("xaasda1312");
             var trueFileName1 = HttpUtility.UrlDecode(fileName, Encoding.UTF8);
             //var trueFileName2 = HttpUtility.UrlDecode(fileName,Encoding.ASCII);
 

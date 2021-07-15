@@ -321,14 +321,14 @@
         </member>
         <member name="M:HttpClientExtension.Attribute.UrlAttribute.#ctor(System.String,HttpClientExtension.Model.UrlEnum)">
             <summary>
-            构造器，获取url
+            构造器，默认获取路由的url（UrlEnum.Normal）
             </summary>
             <param name="url">地址</param>
             <param name="urlType">地址类型</param>
         </member>
         <member name="M:HttpClientExtension.Attribute.UrlAttribute.#ctor(System.String,System.String)">
             <summary>
-            构造器，获取完整Url（默认 使用 UrlEnum.Full）
+            构造器，获取完整Url（后台默认 使用 UrlEnum.Full）
             </summary>
             <param name="routeUrl">路由地址</param>
             <param name="baseUrl">基础地址</param>
