@@ -258,11 +258,6 @@
             httppost特性标签
             </summary>
         </member>
-        <member name="F:HttpClientExtension.Attribute.HttpPostAttribute.customHeader">
-            <summary>
-            自定义请求头
-            </summary>
-        </member>
         <member name="M:HttpClientExtension.Attribute.HttpPostAttribute.Before(System.String,System.Object[],System.Type,System.Object)">
             <summary>
             调用前
