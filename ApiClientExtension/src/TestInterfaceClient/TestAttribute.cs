@@ -59,7 +59,7 @@ namespace TestInterfaceClient
        [Argument(Source.ReturnType)] Type rtype,
        [Argument(Source.Metadata)] MethodBase methodBase)
         {
-            if (arguments?.Length==1 && arguments[0] is string test)
+            if (arguments?.Length == 1 && arguments[0] is string test)
             {
                 arguments[0] = "inject success";
             }
