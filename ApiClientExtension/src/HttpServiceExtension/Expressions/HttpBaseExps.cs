@@ -61,6 +61,19 @@ namespace HttpServiceExtension.Expressions
             var func2 = Expression.Lambda<Func<ParameterInfo, T>>(methodCallExp2, param_ParameterInfo).Compile();
             return func2;
         }
-
+        /// <summary>
+        /// 构造方法参数ParameterInfo的GetAttribute方法的表达式树
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        private static Func<MethodBase, T> BuildGetMethodAttribute<T>() where T : Attribute
+        {
+            var param_ParameterInfo = Expression.Parameter(typeof(ParameterInfo), "ParamInfo");
+            // 泛型方法
+            var methodInfo2 = typeof(CustomAttributeExtensions).GetMethod("GetCustomAttribute", new Type[] { typeof(MethodBase) }).MakeGenericMethod(typeof(T));
+            var methodCallExp2 = Expression.Call(null, methodInfo2, param_ParameterInfo); // 调用静态方法，第一个参数是null
+            var func2 = Expression.Lambda<Func<MethodBase, T>>(methodCallExp2, param_ParameterInfo).Compile();
+            return func2;
+        }
     }
 }

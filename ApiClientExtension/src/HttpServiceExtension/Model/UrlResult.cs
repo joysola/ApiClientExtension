@@ -7,7 +7,7 @@ namespace HttpServiceExtension.Model
     /// <summary>
     /// url处理后的结果
     /// </summary>
-    class UrlResult
+    public class UrlResult
     {
         /// <summary>
         /// 地址
