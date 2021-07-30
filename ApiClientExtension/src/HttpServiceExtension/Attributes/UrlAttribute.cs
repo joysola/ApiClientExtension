@@ -14,21 +14,23 @@ namespace HttpServiceExtension.Attributes
 
         readonly string _url;
         readonly UrlEnum _urlEnum;
+       
         /// <summary>
         /// 构造器,默认获取路由的url
         /// </summary>
         /// <param name="url"></param>
-        public UrlAttribute(string url)
+        public UrlAttribute(string url = "")
         {
             this._url = url;
             this._urlEnum = UrlEnum.Normal;
+           
         }
         /// <summary>
         /// 构造器，默认获取路由的url（UrlEnum.Normal）
         /// </summary>
         /// <param name="url">地址</param>
         /// <param name="urlType">地址类型</param>
-        public UrlAttribute(string url, UrlEnum urlType = UrlEnum.Normal)
+        public UrlAttribute(string url,  UrlEnum urlType = UrlEnum.Normal)
         {
             this._url = url;
             this._urlEnum = urlType;

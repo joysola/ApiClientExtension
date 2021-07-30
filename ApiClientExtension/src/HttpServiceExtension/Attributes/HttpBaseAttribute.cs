@@ -1,4 +1,5 @@
 ﻿using HttpServiceExtension.Expressions;
+using HttpServiceExtension.Helper;
 using HttpServiceExtension.Model;
 using HttpServiceExtension.Services;
 using Newtonsoft.Json;
@@ -6,9 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HttpServiceExtension.Attributes
@@ -17,18 +20,65 @@ namespace HttpServiceExtension.Attributes
     public class HttpBaseAttribute : Attribute
     {
         private static readonly Dictionary<Type, Action<object, dynamic>> setFieldValueDict = new Dictionary<Type, Action<object, dynamic>>();
-
-        internal HttpClientBase BaseClient { get; } = Startup.Singleton.GetService<HttpClientBase>();
-        internal IHttpClientFactory ClientFactory { get; } = Startup.Singleton.GetService<IHttpClientFactory>();
+        private static readonly SemaphoreSlim _locker = new SemaphoreSlim(1, 1);
+        //internal IHttpClientFactory ClientFactory { get; } = Startup.Instance.GetService<IHttpClientFactory>();
+        /// <summary>
+        /// 处理http请求核心方法
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="instance"></param>
+        /// <param name="targetType"></param>
+        /// <param name="rtype"></param>
+        /// <param name="target"></param>
+        /// <param name="arguments"></param>
+        /// <param name="attrs"></param>
+        /// <param name="methodBase"></param>
+        /// <param name="typeEnum"></param>
+        /// <returns></returns>
+        internal dynamic GetHttpResult(string name, object instance, Type targetType, Type rtype, Func<object[], object> target, object[] arguments, Attribute[] attrs, MethodBase methodBase, RequestTypeEnum typeEnum)
+        {
+            var isService = IsBaseServiceRequest(targetType); // 是否继承了BaseService
+            dynamic response = null;
+            if (isService && IsControllerRequest(instance)) // controller直接执行方法
+            {
+                response = target(arguments);
+            }
+            else // 使用baseservice
+            {
+                UrlResult urlRes = GetUrlResult(arguments, attrs, methodBase, name, targetType); // 获取请求地址
+                var httpResponse = Send(urlRes, typeEnum); // 发送请求
+                if (httpResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    dynamic result = GetResultData(urlRes.BaseClient, httpResponse, rtype); // 获取数据结果
+                    if (!isService) // baseApi类型需要将值设置给其baseResult属性
+                    {
+                        var action = BuildSetbaseResultAction(instance);
+                        action(instance, result);
+                        response = target(arguments);
+                    }
+                    else // service类型直接返回结果
+                    {
+                        response = result;
+                    }
+                }
+                else
+                {
+                    throw new HttpServiceException($"WebApi访问失败！错误代码：{(int)httpResponse.StatusCode}");
+                }
+                //BenchmarkHelper.Instance.BeginBenchmark(name, type, instance, url);
+                //BenchmarkHelper.Instance.EndBenchmark(name, type, instance, url);
+            }
+            return response;
+        }
         /// <summary>
         /// 是否是Service发出的请求
         /// </summary>
         /// <param name="targetType"></param>
         /// <returns></returns>
-        protected bool IsBaseApiRequest(Type targetType)
+        private bool IsBaseServiceRequest(Type targetType)
         {
             var result = true;
-            if (targetType.BaseType?.Name != typeof(BaseApi<>).Name)
+            if (targetType.BaseType?.Name != typeof(BaseService<>).Name)
             {
                 result = false;
             }
@@ -39,9 +89,10 @@ namespace HttpServiceExtension.Attributes
         /// </summary>
         /// <param name="instance"></param>
         /// <returns></returns>
-        protected bool IsControllerRequest(dynamic instance)
+        private bool IsControllerRequest(dynamic instance)
         {
-            var clientInstance = instance.ClientInstance; //targetType.BaseType?.GetProperty("ClientInstance", BindingFlags.Static | BindingFlags.Public)?.GetValue(instance);
+            // targetType.BaseType?.GetProperty("ClientInstance", BindingFlags.Static | BindingFlags.Public)?.GetValue(instance);
+            var clientInstance = instance.Client;
             return clientInstance != instance;
         }
         /// <summary>
@@ -50,87 +101,129 @@ namespace HttpServiceExtension.Attributes
         /// <param name="arguments"></param>
         /// <param name="methodBase"></param>
         /// <returns></returns>
-        protected UrlResult GetUrl(object[] arguments, Attribute[] attrs, MethodBase methodBase, string name, Type targetType)
+        internal UrlResult GetUrlResult(object[] arguments, Attribute[] attrs, MethodBase methodBase, string name, Type targetType)
         {
-            if (string.IsNullOrEmpty(BaseClient.BaseUrl))// 未配置Api地址则停止
+            var clientAttribute = attrs?.FirstOrDefault(x => x is CustomClientAttribute) as CustomClientAttribute;
+            var baseClient = Startup.Instance.GetClient(clientAttribute?.ClientName) ?? Startup.Instance.GetService<HttpClientBase>();
+            if (string.IsNullOrEmpty(baseClient.BaseUrl))// 未配置Api的BaseUrl地址则停止
             {
                 throw new HttpServiceException("请配置Api地址！");
             }
-            var urlAttribute = attrs?.FirstOrDefault(x => x.GetType() == typeof(UrlAttribute)) as UrlAttribute;
-            //var urlAttribute = methodBase.GetCustomAttribute<UrlAttribute>();
-            var urlInfo = urlAttribute?.Url; // 请求地址
-            if (string.IsNullOrEmpty(urlInfo))
+            var urlAttribute = attrs?.FirstOrDefault(x => x is UrlAttribute) as UrlAttribute;
+            var routeInfo = urlAttribute?.Url; // 请求路由地址
+            // 没有路由地址，则自动拼接（认为从controller而来）
+            if (string.IsNullOrEmpty(routeInfo))
             {
-                urlInfo = GetRouteBaseUrl(name, targetType);
+                var service = targetType.Name.Replace("Service", "");
+                routeInfo = $"{service}/{name}";
             }
-
-            object postModel = null; // post实体
-            // 构建完整url
             var parameters = methodBase.GetParameters();
-            var dict = new List<KeyValuePair<string, object>>();
-            for (int i = 0; i < arguments.Length; i++)
-            {
-                var postConAttr = HttpBaseExps.Singleton.GetPostContentAttribute(parameters[i]); // 获取post参数特性
-                var parNameAttr = HttpBaseExps.Singleton.GetParamNameAttribute(parameters[i]); // 获取改名参数特性
-                // 是否是post实体
-                if (postConAttr != null)
-                {
-                    postModel = arguments[i]; // post参数不用拼接url
-                }
-                else
-                {
-                    // 判断Url参数是否需要改名字
-                    if (parNameAttr != null)
-                    {
-                        dict.Add(new KeyValuePair<string, object>(parNameAttr.ParamName, arguments[i] ?? string.Empty));
-                    }
-                    else
-                    {
-                        dict.Add(new KeyValuePair<string, object>(parameters[i].Name, arguments[i] ?? string.Empty));
-                    }
-                }
-            }
-            var paramUrl = string.Empty; // url参数
-            if (dict.Count > 0)
-            {
-                paramUrl = this.GetUrlParam(dict);
-            }
-            var url = $"{(urlAttribute.UrlType == UrlEnum.Normal ? BaseClient.BaseUrl : string.Empty)}{urlInfo}{paramUrl}";
-            return new UrlResult { Url = url, PostModel = postModel };
+            // 构建完整url
+            var urlResult = UrlHelper.GetUrl(arguments, parameters, baseClient.BaseUrl, routeInfo, urlAttribute?.UrlType);
+            urlResult.BaseClient = baseClient;
+            return urlResult;
         }
-
-        private string GetRouteBaseUrl(string action, Type targetType)
-        {
-            var service = targetType.Name.Replace("Service", "");
-            var url = $"{service}/{action}";
-            return null;
-        }
-
         /// <summary>
-        /// 获取Url参数
+        /// 使用httpclient发送请求
         /// </summary>
-        /// <param name="list"></param>
+        /// <param name="urlResult"></param>
+        /// <param name="typeEnum">请求类型</param>
         /// <returns></returns>
-        private string GetUrlParam(List<KeyValuePair<string, object>> list)
+        internal HttpResponseMessage Send(UrlResult urlResult, RequestTypeEnum typeEnum)
         {
-            var resList = new List<string>();
-            foreach (var kp in list)
+            var client = urlResult.BaseClient.Client;
+            var url = urlResult.Url;
+            HttpResponseMessage message = null;
+            switch (typeEnum)
             {
-                var toStringType = HttpBaseExps.Singleton.GetToStringType(kp.Value); // 如果value是null，则默认空值
-                if (toStringType == typeof(object)) // 未重载toString方法，跳过
+                case RequestTypeEnum.Get:
+                    message = Get(client, url);
+                    break;
+                case RequestTypeEnum.Post:
+                    HttpContent content = null;
+                    if (urlResult.PostModel is HttpContent postContent) // 非json格式的HttpContent
+                    {
+                        content = postContent;
+                    }
+                    else // 默认json格式StringContent
+                    {
+                        var json = JsonConvert.SerializeObject(urlResult.PostModel); // 序列化需要发送的post实体
+                        content = new StringContent(json, Encoding.UTF8, "application/json"); // 必须带上encode和media-type
+                    }
+                    message = Post(client, url, content);
+                    break;
+            }
+            return message;
+        }
+        
+        /// <summary>
+        /// 获取数据结果
+        /// </summary>
+        /// <param name="baseClient"></param>
+        /// <param name="httpResponse"></param>
+        /// <param name="rtype"></param>
+        /// <returns></returns>
+        private dynamic GetResultData(HttpClientBase baseClient, HttpResponseMessage httpResponse, Type rtype)
+        {
+            var res = false;
+            dynamic result = null;
+            // 1. 
+            if (rtype == typeof(HttpResponseMessage))
+            {
+                res = true;
+                result = httpResponse;
+            }
+            else if (rtype == typeof(Task<HttpResponseMessage>))
+            {
+                res = true;
+                result = Task.FromResult(httpResponse); // 结果装入Task
+            }
+            // 2. 
+            if (res) // 是否返回类型是HttpResponseMessage
+            {
+                return result;
+            }
+            else // 正常
+            {
+                var json = httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
+
+                if (baseClient?.RespPreProcedure.RespPreAction != null && baseClient?.RespPreProcedure.RespPreDescType != null) // 预判
                 {
-                    continue;
+                    dynamic preResult = JsonConvert.DeserializeObject(json, baseClient.RespPreProcedure.RespPreDescType);
+                    baseClient?.RespPreProcedure?.RespPreAction(preResult); // 执行预判方法
                 }
-                else // 重载了tostring
+                result = GetJsonObjData(json, rtype);
+            }
+            return result;
+        }
+        /// <summary>
+        /// 获取json对象对应的数据
+        /// </summary>
+        /// <param name="json">json字符串</param>
+        /// <param name="rtype">json对象类型</param>
+        /// <returns></returns>
+        private dynamic GetJsonObjData(string json, Type rtype)
+        {
+            dynamic result;
+            try
+            {
+                if (rtype.IsGenericType && rtype.GetGenericTypeDefinition() == typeof(Task<>)) // 异步
                 {
-                    resList.Add($"{kp.Key}={kp.Value}");
+                    dynamic obj = JsonConvert.DeserializeObject(json, rtype.GenericTypeArguments[0]) ?? Activator.CreateInstance(rtype.GenericTypeArguments[0]);
+                    result = Task.FromResult(obj); // 结果装入Task
+                }
+                else // 同步
+                {
+                    result = JsonConvert.DeserializeObject(json, rtype) ?? Activator.CreateInstance(rtype);
                 }
             }
-            var paramUrlArray = resList.ToArray();
-            var paramUrl = $"?{string.Join("&", paramUrlArray)}";
-            return paramUrl;
-        }
+            catch
+            {
+                throw;
+            }
 
+            return result;
+        }
         /// <summary>
         /// get方法
         /// </summary>
@@ -173,112 +266,6 @@ namespace HttpServiceExtension.Attributes
 
 
         /// <summary>
-        /// 从response里获取数据，设置数据
-        /// </summary>
-        /// <param name="httpResponse">返回数据</param>
-        /// <param name="instance"></param>
-        /// <param name="rtype"></param>
-        protected void SetResultData(HttpResponseMessage httpResponse, object instance, Type rtype)
-        {
-
-            if (httpResponse.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                if (!IsReturnHttpResponse(httpResponse, instance, rtype)) // 判断返回类型是否是HttpResponseMessage
-                {
-                    DeserializeJsonData(httpResponse, instance, rtype);
-                }
-            }
-            else
-            {
-                throw new HttpServiceException($"WebApi访问失败！错误代码：{(int)httpResponse.StatusCode}");
-            }
-        }
-        /// <summary>
-        /// 判断返回类型是否是HttpResponseMessage，如果是，则处理它（返回它），不是，则进行json反序列化处理
-        /// </summary>
-        /// <param name="httpResponse">返回数据</param>
-        /// <param name="instance">实例</param>
-        /// <param name="rtype">返回类型</param>
-        /// <returns></returns>
-        private bool IsReturnHttpResponse(HttpResponseMessage httpResponse, object instance, Type rtype)
-        {
-            var res = false;
-            dynamic result = null;
-            if (rtype == typeof(HttpResponseMessage))
-            {
-                res = true;
-                result = httpResponse;
-            }
-            else if (rtype == typeof(Task<HttpResponseMessage>))
-            {
-                res = true;
-                result = Task.FromResult(httpResponse); // 结果装入Task
-            }
-            if (result != null)
-            {
-                SetbaseResult(instance, result, rtype);
-            }
-            return res;
-        }
-        /// <summary>
-        /// 反序列化json数据（核心）
-        /// </summary>
-        /// <param name="httpResponse"></param>
-        /// <param name="instance"></param>
-        /// <param name="rtype"></param>
-        private void DeserializeJsonData(HttpResponseMessage httpResponse, object instance, Type rtype)
-        {
-            var json = httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
-                                                                                                                // 预判
-            //if (HttpClientEx.PreProcedure.PreAction != null && HttpClientEx.PreProcedure.PreProcesstype != null)
-            //{
-            //    dynamic preResult = JsonConvert.DeserializeObject(json, HttpClientEx.PreProcedure.PreProcesstype);
-            //    HttpClientEx.PreProcedure.PreAction(preResult); // 执行预判方法
-            //}
-    
-            try
-            {
-                if (rtype.IsGenericType && rtype.GetGenericTypeDefinition() == typeof(Task<>)) // 异步
-                {
-                    dynamic result = JsonConvert.DeserializeObject(json, rtype.GenericTypeArguments[0]);
-                    //var result = Convert.ChangeType(zzz.data, rtype.GenericTypeArguments[0]);
-                    var taskResult = Task.FromResult(result); // 结果装入Task
-                    SetbaseResult(instance, taskResult, rtype.GenericTypeArguments[0]);
-                    //baseResult.SetValue(ins, taskResult, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
-                }
-                else // 同步
-                {
-                    dynamic result = JsonConvert.DeserializeObject(json, rtype);
-                    //baseResult.SetValue(ins, result, BindingFlags.NonPublic | BindingFlags.Instance, null, null);
-                    SetbaseResult(instance, result, rtype);
-                }
-            }
-            catch (Exception ex)
-            {
-                //Logger.Error("HttpBase出错！", ex);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// instance（父类）的baseResult赋值
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <param name="result"></param>
-        /// <param name="type">返回类型</param>
-        private void SetbaseResult(object instance, dynamic result, Type type)
-        {
-            var action = BuildSetbaseResultAction(instance/*, result*/);
-            if (result == null) // 若result（反序列化结果为null，则返回type类型默认实例）
-            {
-                action(instance, Activator.CreateInstance(type));
-            }
-            else
-            {
-                action(instance, result);
-            }
-        }
-        /// <summary>
         /// 生成给instance（父类）的baseResult赋值的action
         /// </summary>
         /// <param name="instance"></param>
@@ -290,8 +277,10 @@ namespace HttpServiceExtension.Attributes
             {
                 return action;
             }
-            lock (locker)
+            try
             {
+                _locker.Wait();
+
                 // 双检锁。。。
                 if (setFieldValueDict.TryGetValue(insType, out action))
                 {
@@ -307,6 +296,11 @@ namespace HttpServiceExtension.Attributes
                 setFieldValueDict.Add(insType, setfieldAction);
                 return setfieldAction;
             }
+            finally
+            {
+                _locker.Release();
+            }
+
             //setfieldAction(instance, result);
             // 查看是否成功赋值
             //var getfieldFunc = Expression.Lambda<Func<object, dynamic>>(fieldExp, param_ins).Compile();

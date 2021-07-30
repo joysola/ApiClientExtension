@@ -7,15 +7,19 @@ namespace HttpServiceExtension.Model
     /// <summary>
     /// url处理后的结果
     /// </summary>
-    public class UrlResult
+    class UrlResult
     {
         /// <summary>
         /// 地址
         /// </summary>
-        public string Url { get; set; }
+        internal string Url { get; set; }
         /// <summary>
         /// post的实体
         /// </summary>
-        public object PostModel { get; set; }
+        internal object PostModel { get; set; }
+        /// <summary>
+        /// 对应client信息
+        /// </summary>
+        internal HttpClientBase BaseClient { get; set; }
     }
 }

@@ -9,27 +9,26 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using TestModel;
+using TestServices;
 
 namespace TestCoreWebApi.Controllers
 {
     //[Route("api/[controller]")]
     //[ApiController]
+    [Produces("application/json")]
     public class TestController : ControllerBase
     {
-        [HttpGet]
-        public async Task<string> GetXXX(string xx)
+        ITestService _testService;
+        public TestController(ITestService testService)
         {
-            var clientFactory = HttpServiceExtension.Startup.Singleton.GetService<IHttpClientFactory>();
-            var client = clientFactory.CreateClient("base");
-            var ss = HttpServiceExtension.Startup.Singleton.GetService<HttpClientBase>();
-            ss.BaseUrl = "http://localhost:50992/api/Test2/my2/99";
-            var resulk = await client.GetAsync("http://localhost:50992/api/Test2/my2/99");
-            if (resulk.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                var str = await resulk.Content.ReadAsStringAsync();
-                return str;
-            }
-            return xx;
+            _testService = testService;
+        }
+        [HttpGet]
+        public async Task<string> GetXXX(string name)
+        {
+            //HttpServiceExtension.Startup.Instance.InitStartup();
+            var result = _testService.GetXXX(name);
+            return result;
         }
 
         [Produces("application/json")]

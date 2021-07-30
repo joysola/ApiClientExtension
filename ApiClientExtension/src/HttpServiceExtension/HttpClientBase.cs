@@ -1,15 +1,20 @@
-﻿using System;
+﻿using HttpServiceExtension.Model;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 
 namespace HttpServiceExtension
 {
-  
+
     public class HttpClientBase
     {
         private string _baseUrl;
+
         internal HttpClient Client { get; }
+
+        internal RespPreProcess RespPreProcedure { get; set; } = new RespPreProcess();
+
         /// <summary>
         /// 主要的Url，用于复用
         /// </summary>
@@ -57,5 +62,19 @@ namespace HttpServiceExtension
                 Client.Timeout = TimeSpan.FromMilliseconds(milliseconds);
             }
         }
+        /// <summary>
+        /// 返回的json结果预处理
+        /// </summary>
+        /// <param name="preAction">预处理委托</param>
+        /// <param name="preType">返回结果反序列化类型</param>
+        public void SetJsonPrePorcess(Action<dynamic> preAction, Type preType)
+        {
+            if (preAction != null)
+            {
+                RespPreProcedure.RespPreAction = preAction;
+                RespPreProcedure.RespPreDescType = preType ?? typeof(object);
+            }
+        }
+
     }
 }

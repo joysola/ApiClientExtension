@@ -9,7 +9,7 @@ namespace HttpServiceExtension.Expressions
 {
     class HttpBaseExps
     {
-        public static HttpBaseExps Singleton { get; } = new HttpBaseExps();
+        public static HttpBaseExps Instance { get; } = new HttpBaseExps();
         private HttpBaseExps() { }
         /// <summary>
         /// 获取参数的PostContentAttribute 特性的方法
@@ -30,6 +30,7 @@ namespace HttpServiceExtension.Expressions
 
             var param_obj = Expression.Parameter(typeof(object), "obj"); // 入参
             var const_Null = Expression.Constant(null, typeof(object)); // null常量
+            var const_NullType = Expression.Constant(typeof(object),typeof(Type)); // object类型常量
 
             var euqalNull_exp = Expression.Equal(param_obj, const_Null); // 判断param_obj是否是null
 
@@ -41,7 +42,7 @@ namespace HttpServiceExtension.Expressions
             var propExp = Expression.Property(method_getMethodExp, "DeclaringType");
 
             // 如果param_obj == null，则 返回 null 否则 调用 ToString方法
-            var exp = Expression.Condition(euqalNull_exp, const_Null, propExp);
+            var exp = Expression.Condition(euqalNull_exp, const_NullType, propExp);
 
             var func = Expression.Lambda<Func<object, Type>>(exp, param_obj).Compile();
             return func;

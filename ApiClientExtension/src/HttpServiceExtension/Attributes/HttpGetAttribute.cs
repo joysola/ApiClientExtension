@@ -1,4 +1,5 @@
 ﻿using AspectInjector.Broker;
+using HttpServiceExtension.Model;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -68,29 +69,7 @@ namespace HttpServiceExtension.Attributes
         [Argument(Source.Triggers)] Attribute[] attrs,
         [Argument(Source.Metadata)] MethodBase methodBase)
         {
-            var url = base.GetUrl(arguments, attrs, methodBase, name, targetType).Url; // 获取请求地址
-            if (IsBaseApiRequest(targetType)) // 使用baseapi
-            {
-
-            }
-            else // 使用baseservice
-            {
-
-                if (IsControllerRequest(instance))
-                {
-                    //BenchmarkHelper.Instance.BeginBenchmark(name, type, instance, url);
-                    // get请求获取数据
-                    var getResponse = base.Get(url);
-                    //BenchmarkHelper.Instance.EndBenchmark(name, type, instance, url);
-                    return null;
-                    //base.SetResultData(getResponse, instance, rtype); // 设置数据
-                }
-                else
-                {
-                    return target(arguments);
-                }
-            }
-
+            return GetHttpResult(name, instance, targetType, rtype, target, arguments, attrs, methodBase, RequestTypeEnum.Get);
         }
     }
 }

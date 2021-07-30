@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net462;</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net461;net462;</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AspectInjector" Version="2.5.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

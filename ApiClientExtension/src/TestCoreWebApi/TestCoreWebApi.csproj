@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HttpServiceExtension\HttpServiceExtension.csproj" />
     <ProjectReference Include="..\TestModel\TestModel.csproj" />
+    <ProjectReference Include="..\TestServices\TestServices.csproj" />
   </ItemGroup>
 
 
