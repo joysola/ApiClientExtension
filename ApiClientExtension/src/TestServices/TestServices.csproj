@@ -67,6 +67,10 @@
       <Project>{84588fa8-a031-46a1-95da-a7cf00dc1ef5}</Project>
       <Name>HttpServiceExtension</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TestModel\TestModel.csproj">
+      <Project>{BB225332-39A7-4735-86F7-1456D9D05FC3}</Project>
+      <Name>TestModel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\AspectInjector.2.5.0\build\netstandard2.0\AspectInjector.targets" Condition="Exists('..\..\packages\AspectInjector.2.5.0\build\netstandard2.0\AspectInjector.targets')" />
