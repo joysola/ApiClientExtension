@@ -37,9 +37,9 @@ namespace HttpServiceExtension.Attributes
         /// <returns></returns>
         internal dynamic GetHttpResult(string name, object instance, Type targetType, Type rtype, Func<object[], object> target, object[] arguments, Attribute[] attrs, MethodBase methodBase, RequestTypeEnum typeEnum)
         {
-            var isService = IsBaseServiceRequest(targetType); // 是否继承了BaseService
             dynamic response = null;
-            if (isService && IsControllerRequest(instance)) // controller直接执行方法
+            var isService = IsBaseServiceRequest(targetType); // 是否继承了BaseService
+            if (isService && IsControllerRequest(targetType, instance)) // controller直接执行方法
             {
                 response = target(arguments);
             }
@@ -87,12 +87,12 @@ namespace HttpServiceExtension.Attributes
         /// <summary>
         /// 判断是否是Controller请求
         /// </summary>
-        /// <param name="instance"></param>
+        /// <param name="targetType">调用类型</param>
+        /// <param name="instance">调用对象</param>
         /// <returns></returns>
-        private bool IsControllerRequest(dynamic instance)
+        private bool IsControllerRequest(Type targetType, object instance)
         {
-            // targetType.BaseType?.GetProperty("ClientInstance", BindingFlags.Static | BindingFlags.Public)?.GetValue(instance);
-            var clientInstance = instance.Client;
+            var clientInstance = HttpBaseExps.Instance.GetStaticPropValue(targetType.BaseType, "ClientInstance");
             return clientInstance != instance;
         }
         /// <summary>
@@ -155,7 +155,7 @@ namespace HttpServiceExtension.Attributes
             }
             return message;
         }
-        
+
         /// <summary>
         /// 获取数据结果
         /// </summary>

@@ -30,7 +30,7 @@ namespace HttpServiceExtension.Expressions
 
             var param_obj = Expression.Parameter(typeof(object), "obj"); // 入参
             var const_Null = Expression.Constant(null, typeof(object)); // null常量
-            var const_NullType = Expression.Constant(typeof(object),typeof(Type)); // object类型常量
+            var const_NullType = Expression.Constant(typeof(object), typeof(Type)); // object类型常量
 
             var euqalNull_exp = Expression.Equal(param_obj, const_Null); // 判断param_obj是否是null
 
@@ -47,7 +47,28 @@ namespace HttpServiceExtension.Expressions
             var func = Expression.Lambda<Func<object, Type>>(exp, param_obj).Compile();
             return func;
         }).Value;
+        /// <summary>
+        /// 获取静态属性值
+        /// </summary>
+        internal Func<Type, string, object> GetStaticPropValue { get; } = new Lazy<Func<Type, string, object>>(() =>
+        {
+            // 实现如下效果：xx.GetProperty("ClientInstance", BindingFlags.Static | BindingFlags.Public)?.GetValue(null)
+            var param_obj = Expression.Parameter(typeof(Type), "obj"); // 入参
+            var param_propName = Expression.Parameter(typeof(string), "name"); // 入参
+            var const_bindFlags = Expression.Constant(BindingFlags.Static | BindingFlags.Public, typeof(BindingFlags)); // 常量
+            var const_PropNull = Expression.Constant(null, typeof(PropertyInfo)); // PropertyInfo的 null常量
+            var const_Null = Expression.Constant(null, typeof(object)); // null常量
 
+            var method_GetProp = Expression.Call(param_obj, nameof(Type.GetProperty), null, param_propName, const_bindFlags);
+
+            var equalNull_exp = Expression.Equal(method_GetProp, const_PropNull); // 判断methodCall_exp是否是null
+
+            var method_GetValue = Expression.Call(method_GetProp, nameof(PropertyInfo.GetValue), null, const_Null);
+
+            var exp = Expression.Condition(equalNull_exp, const_Null, method_GetValue);
+            var func = Expression.Lambda<Func<Type, string, object>>(exp, param_obj, param_propName).Compile();
+            return func;
+        }).Value;
         /// <summary>
         /// 构造方法参数ParameterInfo的GetAttribute方法的表达式树
         /// </summary>

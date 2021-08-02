@@ -11,6 +11,5 @@ namespace HttpServiceExtension.Services
     public class BaseService<T> where T : BaseService<T>, new()
     {
         public static T ClientInstance { get; } = new T();
-        public T Client => ClientInstance;
     }
 }
