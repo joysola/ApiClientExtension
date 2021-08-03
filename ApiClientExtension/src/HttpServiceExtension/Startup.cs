@@ -12,9 +12,18 @@ namespace HttpServiceExtension
         private readonly ServiceCollection _services = new ServiceCollection();
 
         public static Startup Instance { get; } = new Startup();
+        /// <summary>
+        /// HttpClientBase字典
+        /// </summary>
         internal Dictionary<string, Type> ClientDict = new Dictionary<string, Type>();
+        /// <summary>
+        /// 私有构造器
+        /// </summary>
         private Startup() => ConfigureServices(_services);
-
+        /// <summary>
+        /// 默认初始化的服务
+        /// </summary>
+        /// <param name="services"></param>
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpClient();
@@ -31,14 +40,20 @@ namespace HttpServiceExtension
             ClientDict.Add(type.Name, type);
         }
 
-
+        /// <summary>
+        /// 初始化
+        /// </summary>
         public void InitStartup()
         {
             _serviceProvider = _services.BuildServiceProvider();
         }
 
-
-        public HttpClientBase GetClient(string clientName)
+        /// <summary>
+        /// 获取httpclientbase
+        /// </summary>
+        /// <param name="clientName"></param>
+        /// <returns></returns>
+        internal HttpClientBase GetClient(string clientName)
         {
             if (!string.IsNullOrEmpty(clientName) && ClientDict.TryGetValue(clientName, out Type type))
             {

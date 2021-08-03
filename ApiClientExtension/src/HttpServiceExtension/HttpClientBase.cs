@@ -10,11 +10,18 @@ namespace HttpServiceExtension
     public class HttpClientBase
     {
         private string _baseUrl;
-
+        /// <summary>
+        /// HttpClient
+        /// </summary>
         internal HttpClient Client { get; }
-
+        /// <summary>
+        /// 返回响应的预处理
+        /// </summary>
         internal RespPreProcess RespPreProcedure { get; set; } = new RespPreProcess();
-
+        /// <summary>
+        /// json处理
+        /// </summary>
+        internal JsonProcess JsonProcedure { get; set; } = new JsonProcess();
         /// <summary>
         /// 主要的Url，用于复用
         /// </summary>
@@ -75,6 +82,21 @@ namespace HttpServiceExtension
                 RespPreProcedure.RespPreDescType = preType ?? typeof(object);
             }
         }
-
+        /// <summary>
+        /// 配置json处理方式
+        /// </summary>
+        /// <param name="deserialize">反序列化委托 （json、反序列化类型、返回对象）</param>
+        /// <param name="serialize">序列化（对象，返回字符串）</param>
+        public void SetJsonSerialize(Func<string, Type, object> deserialize, Func<object, string> serialize)
+        {
+            if (deserialize != null)
+            {
+                JsonProcedure.Deserialize = deserialize;
+            }
+            if (serialize != null)
+            {
+                JsonProcedure.Serialize = serialize;
+            }
+        }
     }
 }

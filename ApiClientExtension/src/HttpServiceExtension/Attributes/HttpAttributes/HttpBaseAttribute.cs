@@ -104,11 +104,12 @@ namespace HttpServiceExtension.Attributes
         internal UrlResult GetUrlResult(object[] arguments, Attribute[] attrs, MethodBase methodBase, string name, Type targetType)
         {
             var clientAttribute = attrs?.FirstOrDefault(x => x is CustomClientAttribute) as CustomClientAttribute;
-            var baseClient = Startup.Instance.GetClient(clientAttribute?.ClientName) ?? Startup.Instance.GetService<HttpClientBase>();
+            var baseClient = Startup.Instance.GetClient(clientAttribute?.ClientName) ?? Startup.Instance.GetService<HttpClientBase>(); // 获取httpclientbase
             if (string.IsNullOrEmpty(baseClient.BaseUrl))// 未配置Api的BaseUrl地址则停止
             {
                 throw new HttpServiceException("请配置Api地址！");
             }
+
             var urlAttribute = attrs?.FirstOrDefault(x => x is UrlAttribute) as UrlAttribute;
             var routeInfo = urlAttribute?.Url; // 请求路由地址
             // 没有路由地址，则自动拼接（认为从controller而来）
@@ -131,7 +132,8 @@ namespace HttpServiceExtension.Attributes
         /// <returns></returns>
         internal HttpResponseMessage Send(UrlResult urlResult, RequestTypeEnum typeEnum)
         {
-            var client = urlResult.BaseClient.Client;
+            var client = urlResult.BaseClient.Client; // httpclient
+            var jsonProcess = urlResult.BaseClient.JsonProcedure; // json处理
             var url = urlResult.Url;
             HttpResponseMessage message = null;
             switch (typeEnum)
@@ -147,7 +149,7 @@ namespace HttpServiceExtension.Attributes
                     }
                     else // 默认json格式StringContent
                     {
-                        var json = JsonConvert.SerializeObject(urlResult.PostModel); // 序列化需要发送的post实体
+                        var json = jsonProcess.Serialize(urlResult.PostModel); // 序列化需要发送的post实体
                         content = new StringContent(json, Encoding.UTF8, "application/json"); // 必须带上encode和media-type
                     }
                     message = Post(client, url, content);
@@ -185,14 +187,15 @@ namespace HttpServiceExtension.Attributes
             }
             else // 正常
             {
+                var jsonProcess = baseClient.JsonProcedure; // json处理
                 var json = httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
 
                 if (baseClient?.RespPreProcedure.RespPreAction != null && baseClient?.RespPreProcedure.RespPreDescType != null) // 预判
                 {
-                    dynamic preResult = JsonConvert.DeserializeObject(json, baseClient.RespPreProcedure.RespPreDescType);
+                    dynamic preResult = jsonProcess.Deserialize(json, baseClient.RespPreProcedure.RespPreDescType); // 反序列化
                     baseClient?.RespPreProcedure?.RespPreAction(preResult); // 执行预判方法
                 }
-                result = GetJsonObjData(json, rtype);
+                result = GetJsonObjData(json, rtype, jsonProcess); // 获取json对象对应的数据
             }
             return result;
         }
@@ -202,19 +205,19 @@ namespace HttpServiceExtension.Attributes
         /// <param name="json">json字符串</param>
         /// <param name="rtype">json对象类型</param>
         /// <returns></returns>
-        private dynamic GetJsonObjData(string json, Type rtype)
+        private dynamic GetJsonObjData(string json, Type rtype, JsonProcess jsonProcess)
         {
             dynamic result;
             try
             {
                 if (rtype.IsGenericType && rtype.GetGenericTypeDefinition() == typeof(Task<>)) // 异步
                 {
-                    dynamic obj = JsonConvert.DeserializeObject(json, rtype.GenericTypeArguments[0]) ?? Activator.CreateInstance(rtype.GenericTypeArguments[0]);
+                    dynamic obj = jsonProcess.Deserialize(json, rtype.GenericTypeArguments[0]) ?? Activator.CreateInstance(rtype.GenericTypeArguments[0]);
                     result = Task.FromResult(obj); // 结果装入Task
                 }
                 else // 同步
                 {
-                    result = JsonConvert.DeserializeObject(json, rtype) ?? Activator.CreateInstance(rtype);
+                    result = jsonProcess.Deserialize(json, rtype) ?? Activator.CreateInstance(rtype);
                 }
             }
             catch
