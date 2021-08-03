@@ -45,11 +45,24 @@ namespace HttpServiceExtension.Attributes
             }
             else // 使用baseservice
             {
+                var benchmark = Startup.Instance.GetService<Benchmark>();
+                benchmark.StartTime = DateTime.Now;
+                benchmark.RequestType = typeEnum;
+                benchmark.TargetType = targetType;
+                benchmark.MethodName = name;
+
                 UrlResult urlRes = GetUrlResult(arguments, attrs, methodBase, name, targetType); // 获取请求地址
-                var httpResponse = Send(urlRes, typeEnum); // 发送请求
+
+
+
+
+                var httpResponse = Send(urlRes, typeEnum, benchmark); // 发送请求
+
+                benchmark.ResponseTime = DateTime.Now;
+
                 if (httpResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    dynamic result = GetResultData(urlRes.BaseClient, httpResponse, rtype); // 获取数据结果
+                    dynamic result = GetResultData(urlRes.BaseClient, httpResponse, rtype, benchmark); // 获取数据结果
                     if (!isService) // baseApi类型需要将值设置给其baseResult属性
                     {
                         var action = BuildSetbaseResultAction(instance);
@@ -65,8 +78,8 @@ namespace HttpServiceExtension.Attributes
                 {
                     throw new HttpServiceException($"WebApi访问失败！错误代码：{(int)httpResponse.StatusCode}");
                 }
-                //BenchmarkHelper.Instance.BeginBenchmark(name, type, instance, url);
-                //BenchmarkHelper.Instance.EndBenchmark(name, type, instance, url);
+
+                benchmark.EndTime = DateTime.Now;
             }
             return response;
         }
@@ -130,12 +143,16 @@ namespace HttpServiceExtension.Attributes
         /// <param name="urlResult"></param>
         /// <param name="typeEnum">请求类型</param>
         /// <returns></returns>
-        internal HttpResponseMessage Send(UrlResult urlResult, RequestTypeEnum typeEnum)
+        internal HttpResponseMessage Send(UrlResult urlResult, RequestTypeEnum typeEnum, Benchmark benchmark)
         {
             var client = urlResult.BaseClient.Client; // httpclient
             var jsonProcess = urlResult.BaseClient.JsonProcedure; // json处理
             var url = urlResult.Url;
             HttpResponseMessage message = null;
+
+            benchmark.Url = urlResult.Url;
+            benchmark.RequsetTime = DateTime.Now;
+
             switch (typeEnum)
             {
                 case RequestTypeEnum.Get:
@@ -150,11 +167,13 @@ namespace HttpServiceExtension.Attributes
                     else // 默认json格式StringContent
                     {
                         var json = jsonProcess.Serialize(urlResult.PostModel); // 序列化需要发送的post实体
+                        benchmark.PostReqJson = json;
                         content = new StringContent(json, Encoding.UTF8, "application/json"); // 必须带上encode和media-type
                     }
                     message = Post(client, url, content);
                     break;
             }
+            benchmark.ResponseTime = DateTime.Now;
             return message;
         }
 
@@ -165,7 +184,7 @@ namespace HttpServiceExtension.Attributes
         /// <param name="httpResponse"></param>
         /// <param name="rtype"></param>
         /// <returns></returns>
-        private dynamic GetResultData(HttpClientBase baseClient, HttpResponseMessage httpResponse, Type rtype)
+        private dynamic GetResultData(HttpClientBase baseClient, HttpResponseMessage httpResponse, Type rtype, Benchmark benchmark)
         {
             var res = false;
             dynamic result = null;
@@ -189,7 +208,7 @@ namespace HttpServiceExtension.Attributes
             {
                 var jsonProcess = baseClient.JsonProcedure; // json处理
                 var json = httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
-
+                benchmark.ResponseJson = json;
                 if (baseClient?.RespPreProcedure.RespPreAction != null && baseClient?.RespPreProcedure.RespPreDescType != null) // 预判
                 {
                     dynamic preResult = jsonProcess.Deserialize(json, baseClient.RespPreProcedure.RespPreDescType); // 反序列化

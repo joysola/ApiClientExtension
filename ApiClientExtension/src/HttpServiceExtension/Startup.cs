@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using HttpServiceExtension.Model;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -28,6 +29,7 @@ namespace HttpServiceExtension
         {
             services.AddHttpClient();
             services.AddSingleton<HttpClientBase>();
+            services.AddTransient<Benchmark>();
         }
         /// <summary>
         /// 新增自定义客户端实现类
