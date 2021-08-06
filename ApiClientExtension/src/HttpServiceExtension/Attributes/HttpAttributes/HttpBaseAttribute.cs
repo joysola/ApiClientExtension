@@ -35,51 +35,32 @@ namespace HttpServiceExtension.Attributes
         /// <param name="methodBase"></param>
         /// <param name="typeEnum"></param>
         /// <returns></returns>
-        internal dynamic GetHttpResult(string name, object instance, Type targetType, Type rtype, Func<object[], object> target, object[] arguments, Attribute[] attrs, MethodBase methodBase, RequestTypeEnum typeEnum)
+        [BenckmarkGetHttpResult]
+        internal dynamic GetHttpResult(string name, object instance, Type targetType, Type rtype, Func<object[], object> target, object[] arguments, Attribute[] attrs, MethodBase methodBase, RequestTypeEnum typeEnum, Benchmark benchmark = null)
         {
             dynamic response = null;
             var isService = IsBaseServiceRequest(targetType); // 是否继承了BaseService
             if (isService && IsControllerRequest(targetType, instance)) // controller直接执行方法
             {
-                response = target(arguments);
+                return target(arguments);
             }
             else // 使用baseservice
             {
-                var benchmark = Startup.Instance.GetService<Benchmark>();
-                benchmark.StartTime = DateTime.Now;
-                benchmark.RequestType = typeEnum;
-                benchmark.TargetType = targetType;
-                benchmark.MethodName = name;
-
                 UrlResult urlRes = GetUrlResult(arguments, attrs, methodBase, name, targetType); // 获取请求地址
-
-
-
-
-                var httpResponse = Send(urlRes, typeEnum, benchmark); // 发送请求
-
-                benchmark.ResponseTime = DateTime.Now;
-
-                if (httpResponse.StatusCode == HttpStatusCode.OK)
+                //var httpResponse = Send(urlRes, typeEnum); 
+                var respResult = SendFetchData(urlRes, typeEnum, rtype, benchmark); // 发送请求 并获取数据
+                dynamic result = respResult?.RespResult; // 获取数据结果
+                if (!isService) // baseApi类型需要将值设置给其baseResult属性
                 {
-                    dynamic result = GetResultData(urlRes.BaseClient, httpResponse, rtype, benchmark); // 获取数据结果
-                    if (!isService) // baseApi类型需要将值设置给其baseResult属性
-                    {
-                        var action = BuildSetbaseResultAction(instance);
-                        action(instance, result);
-                        response = target(arguments);
-                    }
-                    else // service类型直接返回结果
-                    {
-                        response = result;
-                    }
+                    var action = BuildSetbaseResultAction(instance);
+                    action(instance, result);
+                    response = target(arguments);
                 }
-                else
+                else // service类型直接返回结果
                 {
-                    throw new HttpServiceException($"WebApi访问失败！错误代码：{(int)httpResponse.StatusCode}");
+                    response = result;
                 }
-
-                benchmark.EndTime = DateTime.Now;
+                //benchmark.EndTime = DateTime.Now;
             }
             return response;
         }
@@ -138,20 +119,39 @@ namespace HttpServiceExtension.Attributes
             return urlResult;
         }
         /// <summary>
+        /// 发送并获取数据
+        /// </summary>
+        /// <param name="urlResult"></param>
+        /// <param name="typeEnum"></param>
+        /// <param name="rtype"></param>
+        /// <returns></returns>
+        [BenckmarkSendFetchData]
+        internal HttpRespResult SendFetchData(UrlResult urlResult, RequestTypeEnum typeEnum, Type rtype, Benchmark benchmark = null)
+        {
+            HttpRespResult result = null;
+            var httpResponse = Send(urlResult, typeEnum); // 发送数据
+            if (httpResponse.StatusCode == HttpStatusCode.OK)
+            {
+                result = GetResultData(urlResult.BaseClient, httpResponse, rtype); // 获取数据结果
+            }
+            else
+            {
+                throw new HttpServiceException($"WebApi访问失败！错误代码：{(int)httpResponse.StatusCode}");
+            }
+            return result;
+        }
+        /// <summary>
         /// 使用httpclient发送请求
         /// </summary>
         /// <param name="urlResult"></param>
         /// <param name="typeEnum">请求类型</param>
         /// <returns></returns>
-        internal HttpResponseMessage Send(UrlResult urlResult, RequestTypeEnum typeEnum, Benchmark benchmark)
+        private HttpResponseMessage Send(UrlResult urlResult, RequestTypeEnum typeEnum)
         {
             var client = urlResult.BaseClient.Client; // httpclient
             var jsonProcess = urlResult.BaseClient.JsonProcedure; // json处理
             var url = urlResult.Url;
             HttpResponseMessage message = null;
-
-            benchmark.Url = urlResult.Url;
-            benchmark.RequsetTime = DateTime.Now;
 
             switch (typeEnum)
             {
@@ -166,14 +166,13 @@ namespace HttpServiceExtension.Attributes
                     }
                     else // 默认json格式StringContent
                     {
-                        var json = jsonProcess.Serialize(urlResult.PostModel); // 序列化需要发送的post实体
-                        benchmark.PostReqJson = json;
+                        //var json = jsonProcess.Serialize(urlResult.PostModel); // 序列化需要发送的post实体
+                        var json = urlResult.PostJson;
                         content = new StringContent(json, Encoding.UTF8, "application/json"); // 必须带上encode和media-type
                     }
                     message = Post(client, url, content);
                     break;
             }
-            benchmark.ResponseTime = DateTime.Now;
             return message;
         }
 
@@ -184,20 +183,20 @@ namespace HttpServiceExtension.Attributes
         /// <param name="httpResponse"></param>
         /// <param name="rtype"></param>
         /// <returns></returns>
-        private dynamic GetResultData(HttpClientBase baseClient, HttpResponseMessage httpResponse, Type rtype, Benchmark benchmark)
+        private HttpRespResult GetResultData(HttpClientBase baseClient, HttpResponseMessage httpResponse, Type rtype)
         {
             var res = false;
-            dynamic result = null;
+            var result = new HttpRespResult();
             // 1. 
             if (rtype == typeof(HttpResponseMessage))
             {
                 res = true;
-                result = httpResponse;
+                result.RespResult = httpResponse;
             }
             else if (rtype == typeof(Task<HttpResponseMessage>))
             {
                 res = true;
-                result = Task.FromResult(httpResponse); // 结果装入Task
+                result.RespResult = Task.FromResult(httpResponse); // 结果装入Task
             }
             // 2. 
             if (res) // 是否返回类型是HttpResponseMessage
@@ -208,13 +207,13 @@ namespace HttpServiceExtension.Attributes
             {
                 var jsonProcess = baseClient.JsonProcedure; // json处理
                 var json = httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
-                benchmark.ResponseJson = json;
+                result.RespJson = json; // 记录json
                 if (baseClient?.RespPreProcedure.RespPreAction != null && baseClient?.RespPreProcedure.RespPreDescType != null) // 预判
                 {
                     dynamic preResult = jsonProcess.Deserialize(json, baseClient.RespPreProcedure.RespPreDescType); // 反序列化
                     baseClient?.RespPreProcedure?.RespPreAction(preResult); // 执行预判方法
                 }
-                result = GetJsonObjData(json, rtype, jsonProcess); // 获取json对象对应的数据
+                result.RespResult = GetJsonObjData(json, rtype, jsonProcess); // 获取json对象对应的数据
             }
             return result;
         }
@@ -252,7 +251,7 @@ namespace HttpServiceExtension.Attributes
         /// <param name="client"></param>
         /// <param name="url"></param>
         /// <returns></returns>
-        protected HttpResponseMessage Get(HttpClient client, string url)
+        private HttpResponseMessage Get(HttpClient client, string url)
         {
             try
             {
@@ -272,7 +271,7 @@ namespace HttpServiceExtension.Attributes
         /// <param name="url"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        protected HttpResponseMessage Post(HttpClient client, string url, HttpContent content)
+        private HttpResponseMessage Post(HttpClient client, string url, HttpContent content)
         {
             try
             {

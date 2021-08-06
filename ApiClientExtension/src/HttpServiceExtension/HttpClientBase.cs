@@ -23,6 +23,10 @@ namespace HttpServiceExtension
         /// </summary>
         internal JsonProcess JsonProcedure { get; set; } = new JsonProcess();
         /// <summary>
+        /// 测速委托
+        /// </summary>
+        internal Action<string> BenchmarkAction { get; set; }
+        /// <summary>
         /// 主要的Url，用于复用
         /// </summary>
         public string BaseUrl
@@ -96,6 +100,17 @@ namespace HttpServiceExtension
             if (serialize != null)
             {
                 JsonProcedure.Serialize = serialize;
+            }
+        }
+        /// <summary>
+        /// 设置接口调用测速
+        /// </summary>
+        /// <param name="action"></param>
+        public void SetBenchmark(Action<string> action)
+        {
+            if (action!=null)
+            {
+                BenchmarkAction = action;
             }
         }
     }

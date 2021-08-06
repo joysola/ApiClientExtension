@@ -18,6 +18,10 @@ namespace HttpServiceExtension
         /// </summary>
         internal Dictionary<string, Type> ClientDict = new Dictionary<string, Type>();
         /// <summary>
+        /// 是否初始化完成
+        /// </summary>
+        internal bool IsInited { get; set; }
+        /// <summary>
         /// 私有构造器
         /// </summary>
         private Startup() => ConfigureServices(_services);
@@ -47,7 +51,11 @@ namespace HttpServiceExtension
         /// </summary>
         public void InitStartup()
         {
-            _serviceProvider = _services.BuildServiceProvider();
+            if (!IsInited)
+            {
+                _serviceProvider = _services.BuildServiceProvider();
+                IsInited = true;
+            }
         }
 
         /// <summary>
@@ -66,6 +74,11 @@ namespace HttpServiceExtension
             }
             return null;
         }
+        /// <summary>
+        /// 获取注册的服务
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public T GetService<T>() => _serviceProvider.GetService<T>();
         public object GetService(Type type) => _serviceProvider.GetService(type);
 

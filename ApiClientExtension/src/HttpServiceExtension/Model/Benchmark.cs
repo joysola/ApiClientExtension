@@ -13,7 +13,7 @@ namespace HttpServiceExtension.Model
         /// <summary>
         /// 请求类型
         /// </summary>
-        internal RequestTypeEnum RequestType { get; set; }
+        internal RequestTypeEnum? RequestType { get; set; }
         /// <summary>
         /// 方法名
         /// </summary>

@@ -21,5 +21,9 @@ namespace HttpServiceExtension.Model
         /// 对应client信息
         /// </summary>
         internal HttpClientBase BaseClient { get; set; }
+        /// <summary>
+        ///  post的json
+        /// </summary>
+        internal string PostJson => BaseClient?.JsonProcedure?.Serialize(PostModel);
     }
 }
