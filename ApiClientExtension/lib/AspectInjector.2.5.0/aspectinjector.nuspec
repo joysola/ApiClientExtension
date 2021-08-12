@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>AspectInjector</id>
+    <version>2.5.0</version>
+    <title>Aspect Injector - AOP Framework</title>
+    <authors>AspectInjector.Package</authors>
+    <owners>AspectInjector.Package</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">Apache-2.0</license>
+    <licenseUrl>https://licenses.nuget.org/Apache-2.0</licenseUrl>
+    <projectUrl>https://github.com/pamidur/aspect-injector</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/pamidur/aspect-injector/master/package.png</iconUrl>
+    <description>This library provides attributes-based compile-time AOP framework.
+      
+      Create your aspect by marking class with [Aspect], its methods with [Advice] and create trigger attribute with [Injection].
+      That's it! Cross-cutting concerns made easy! Just apply your attribute where you need and everything automicaly works!
+      No xml configs! No wierd reflection hacks! No runtime emit!
+      Works with AOT and Blazor!
+
+      See release notes for this version here:
+      https://github.com/pamidur/aspect-injector/releases/tag/2.5.0</description>
+    <releaseNotes>See here =&gt; https://github.com/pamidur/aspect-injector/releases/tag/2.5.0</releaseNotes>
+    <tags>aop aspect aspects injector injection inpc dotnet core notify notifypropertychanged aot blazor attribute</tags>
+    <repository type="git" url="https://github.com/pamidur/aspect-injector" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+</package>
