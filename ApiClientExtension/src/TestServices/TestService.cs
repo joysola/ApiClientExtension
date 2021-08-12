@@ -17,7 +17,7 @@ namespace TestServices
     public class TestService : BaseService<TestService>, ITestService
     {
         [CustomClient]
-        [HttpGet]
+        [HttpGet("Test/GetXXX")]
         public string GetXXX(string name)
         {
             return $"{name}哈哈哈哈";

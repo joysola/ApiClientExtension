@@ -16,8 +16,10 @@ using System.Threading.Tasks;
 
 namespace HttpServiceExtension.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-    public class HttpBaseAttribute : Attribute
+    /// <summary>
+    /// httpaspect 处理父类
+    /// </summary>
+    public class HttpBaseAspect
     {
         private static readonly Dictionary<Type, Action<object, dynamic>> setFieldValueDict = new Dictionary<Type, Action<object, dynamic>>();
         private static readonly SemaphoreSlim _locker = new SemaphoreSlim(1, 1);
@@ -104,8 +106,8 @@ namespace HttpServiceExtension.Attributes
                 throw new HttpServiceException("请配置Api地址！");
             }
 
-            var urlAttribute = attrs?.FirstOrDefault(x => x is UrlAttribute) as UrlAttribute;
-            var routeInfo = urlAttribute?.Url; // 请求路由地址
+            var httpBaseAttr = attrs?.FirstOrDefault(x => x is HttpBaseAttribute) as HttpBaseAttribute;
+            var routeInfo = httpBaseAttr?.Url; // 请求路由地址
             // 没有路由地址，则自动拼接（认为从controller而来）
             if (string.IsNullOrEmpty(routeInfo))
             {
@@ -114,7 +116,7 @@ namespace HttpServiceExtension.Attributes
             }
             var parameters = methodBase.GetParameters();
             // 构建完整url
-            var urlResult = UrlHelper.GetUrl(arguments, parameters, baseClient.BaseUrl, routeInfo, urlAttribute?.UrlType);
+            var urlResult = UrlHelper.GetUrl(arguments, parameters, baseClient.BaseUrl, routeInfo, httpBaseAttr?.UrlType);
             urlResult.BaseClient = baseClient;
             return urlResult;
         }
@@ -327,5 +329,45 @@ namespace HttpServiceExtension.Attributes
             //var getfieldFunc = Expression.Lambda<Func<object, dynamic>>(fieldExp, param_ins).Compile();
             //var xx = getfieldFunc(instance);
         }
+    }
+
+    /// <summary>
+    /// http请求标签父类
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+    public class HttpBaseAttribute : Attribute
+    {
+        readonly string _url;
+        readonly UrlEnum _urlEnum;
+
+        /// <summary>
+        /// 构造器,默认获取路由的url
+        /// </summary>
+        /// <param name="url"></param>
+        public HttpBaseAttribute(string url = "")
+        {
+            this._url = url;
+            this._urlEnum = UrlEnum.Normal;
+
+        }
+        /// <summary>
+        /// 构造器，默认获取路由的url（UrlEnum.Normal）
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <param name="urlType">地址类型</param>
+        public HttpBaseAttribute(string url, UrlEnum urlType = UrlEnum.Normal)
+        {
+            this._url = url;
+            this._urlEnum = urlType;
+        }
+
+        /// <summary>
+        /// 返回url
+        /// </summary>
+        public string Url => _url;
+        /// <summary>
+        /// url类型
+        /// </summary>
+        public UrlEnum UrlType => _urlEnum;
     }
 }

@@ -31,7 +31,7 @@ namespace HttpServiceExtension.Attributes
             [Argument(Source.Instance)] object instance,
             [Argument(Source.Type)] Type targetType)
         {
-            if (name == nameof(HttpBaseAttribute.SendFetchData) && Startup.Instance.IsInited && arguments.Length > 0)
+            if (name == nameof(HttpBaseAspect.SendFetchData) && Startup.Instance.IsInited && arguments.Length > 0)
             {
                 Bench = arguments[arguments.Length - 1] as Benchmark; // 取出最后一参数
                 if (Bench != null)
@@ -93,7 +93,7 @@ namespace HttpServiceExtension.Attributes
             [Argument(Source.Instance)] object instance,
             [Argument(Source.Type)] Type targetType)
         {
-            if (name == nameof(HttpBaseAttribute.GetHttpResult) && Startup.Instance.IsInited && arguments?.Length > 9)
+            if (name == nameof(HttpBaseAspect.GetHttpResult) && Startup.Instance.IsInited && arguments?.Length > 9)
             {
                 if (arguments[6] is Attribute[] attrs)
                 {

@@ -8,12 +8,10 @@ using System.Text;
 namespace HttpServiceExtension.Attributes
 {
     /// <summary>
-    /// httpget请求特性
+    /// HttpGetAspect aop方法
     /// </summary>
     [Aspect(Scope.Global)]
-    [Injection(typeof(HttpGetAttribute))]
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-    public sealed class HttpGetAttribute : HttpBaseAttribute
+    public sealed class HttpGetAspect : HttpBaseAspect
     {
         /// <summary>
         /// 调用前
@@ -70,6 +68,21 @@ namespace HttpServiceExtension.Attributes
         [Argument(Source.Metadata)] MethodBase methodBase)
         {
             return GetHttpResult(name, instance, targetType, rtype, target, arguments, attrs, methodBase, RequestTypeEnum.Get);
+        }
+    }
+    /// <summary>
+    /// httpget请求特性
+    /// </summary>
+    //[Aspect(Scope.Global)]
+    [Injection(typeof(HttpGetAspect))]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+    public sealed class HttpGetAttribute : HttpBaseAttribute
+    {
+        public HttpGetAttribute(string url = "") : base(url)
+        {
+        }
+        public HttpGetAttribute(string url, UrlEnum urlType = UrlEnum.Normal) : base(url, urlType)
+        {
         }
     }
 }
