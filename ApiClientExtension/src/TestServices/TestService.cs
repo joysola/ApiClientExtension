@@ -29,4 +29,18 @@ namespace TestServices
             return new LoginModel { access_token = login.password, user_name = login.username };
         }
     }
+
+    public interface IFirstServce
+    {
+        string GetInfo();
+    }
+
+    public class FirstServce : IFirstServce
+    {
+        public string GetInfo()
+        {
+            return "";
+        }
+    }
+
 }

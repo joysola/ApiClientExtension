@@ -28,6 +28,7 @@ namespace TestCoreWebApi
             services.AddControllers();
             services.AddHttpClient();
             services.AddSingleton<ITestService, TestService>();
+            services.AddSingleton<IFirstServce, FirstServce>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

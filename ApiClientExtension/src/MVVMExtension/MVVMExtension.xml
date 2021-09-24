@@ -18,7 +18,7 @@
         </member>
         <member name="T:MVVMExtension.NotifyAspectAttribute">
             <summary>
-            WPF属性变化通知
+            WPF的INotifyPropertyChanged通用属性变化通知
             </summary>
         </member>
         <member name="E:MVVMExtension.NotifyAspectAttribute.PropertyChanged">
