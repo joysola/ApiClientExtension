@@ -40,6 +40,20 @@ namespace TestCoreWebApi.Controllers
             return result;
         }
 
+        [HttpPost]
+        public async Task<ApiResponse<LoginModel>> CustomPostXXX([FromBody] QueryLoginModel loginModel)
+        {
+            var result = _testService.CustomPostXXX(loginModel);
+            return new ApiResponse<LoginModel> { code = "200", data = result, msg = "dasdasd", success = true };
+        }
+
+        [HttpGet]
+        public async Task<string> GetYYY2(string name)
+        {
+            //HttpServiceExtension.Startup.Instance.InitStartup();
+            var result = _testService.GetYYY(name);
+            return result;
+        }
 
     }
 

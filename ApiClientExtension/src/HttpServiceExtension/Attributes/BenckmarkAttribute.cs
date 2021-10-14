@@ -31,7 +31,7 @@ namespace HttpServiceExtension.Attributes
             [Argument(Source.Instance)] object instance,
             [Argument(Source.Type)] Type targetType)
         {
-            if (name == nameof(HttpBaseAspect.SendFetchData) && Startup.Instance.IsInited && arguments.Length > 0)
+            if (name == nameof(HttpBaseAspect.SendFetchData) && HttpServiceExStartup.Instance.IsInited && arguments.Length > 0)
             {
                 Bench = arguments[arguments.Length - 1] as Benchmark; // 取出最后一参数
                 if (Bench != null)
@@ -39,8 +39,8 @@ namespace HttpServiceExtension.Attributes
                     Bench.RequsetTime = DateTime.Now; // 请求开始时间
                     Bench.RequestType = arguments[1] as RequestTypeEnum?; // 请求类型
                     var urlResult = arguments[0] as UrlResult;
-                    Bench.Url = urlResult.Url;
-                    Bench.PostReqJson = urlResult.PostJson; // 请求实体json
+                    Bench.Url = urlResult?.Url;
+                    Bench.PostReqJson = urlResult?.PostJson; // 请求实体json
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace HttpServiceExtension.Attributes
             [Argument(Source.Instance)] object instance)
         {
             //
-            if (Bench != null && Startup.Instance.IsInited && returnValue is HttpRespResult result)
+            if (Bench != null && HttpServiceExStartup.Instance.IsInited && returnValue is HttpRespResult result)
             {
                 Bench.ResponseJson = result.RespJson; // 响应实体
                 Bench.ResponseTime = DateTime.Now; // 响应结束时间
@@ -93,16 +93,16 @@ namespace HttpServiceExtension.Attributes
             [Argument(Source.Instance)] object instance,
             [Argument(Source.Type)] Type targetType)
         {
-            if (name == nameof(HttpBaseAspect.GetHttpResult) && Startup.Instance.IsInited && arguments?.Length > 9)
+            if (name == nameof(HttpBaseAspect.GetHttpResult) && HttpServiceExStartup.Instance.IsInited && arguments?.Length > 9)
             {
                 if (arguments[6] is Attribute[] attrs)
                 {
                     var clientAttribute = attrs?.FirstOrDefault(x => x is CustomClientAttribute) as CustomClientAttribute;
-                    var baseClient = Startup.Instance.GetClient(clientAttribute?.ClientName) ?? Startup.Instance.GetService<HttpClientBase>(); // 获取httpclientbase
+                    var baseClient = HttpServiceExStartup.Instance.GetClient(clientAttribute?.ClientName) ?? HttpServiceExStartup.Instance.GetService<HttpClientBase>(); // 获取httpclientbase
                     BenchmarkAction = baseClient.BenchmarkAction; // 获取对应的测速方法
                     if (BenchmarkAction != null)
                     {
-                        Bench = Startup.Instance.GetService<Benchmark>();
+                        Bench = HttpServiceExStartup.Instance.GetService<Benchmark>();
                         Bench.StartTime = DateTime.Now;
                         Bench.TargetType = arguments[2] as Type; // 请求对象的类型
                         Bench.MethodName = arguments[0] as string; // 请求方法的名字
@@ -126,7 +126,7 @@ namespace HttpServiceExtension.Attributes
             [Argument(Source.Instance)] object instance)
         {
             //
-            if (Bench != null && Startup.Instance.IsInited && BenchmarkAction != null)
+            if (Bench != null && HttpServiceExStartup.Instance.IsInited && BenchmarkAction != null)
             {
                 Bench.EndTime = DateTime.Now; // 记录结束时间
                 BenchmarkAction(Bench.Result); // 输出记录日志

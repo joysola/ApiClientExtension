@@ -94,30 +94,35 @@ namespace HttpServiceExtension.Attributes
         /// <summary>
         /// 获取url信息
         /// </summary>
-        /// <param name="arguments"></param>
-        /// <param name="methodBase"></param>
+        /// <param name="arguments">方法参数</param>
+        /// <param name="attrs">aop特性标签</param>
+        /// <param name="methodBase">方法信息</param>
+        /// <param name="name">方法名称</param>
+        /// <param name="name">方法所在对象类型</param>
         /// <returns></returns>
         internal UrlResult GetUrlResult(object[] arguments, Attribute[] attrs, MethodBase methodBase, string name, Type targetType)
         {
-            var clientAttribute = attrs?.FirstOrDefault(x => x is CustomClientAttribute) as CustomClientAttribute;
-            var baseClient = Startup.Instance.GetClient(clientAttribute?.ClientName) ?? Startup.Instance.GetService<HttpClientBase>(); // 获取httpclientbase
+            var allAttris = methodBase?.GetCustomAttributes(); // 获取方法所有标签
+            var clientAttribute = allAttris?.FirstOrDefault(x => x is CustomClientAttribute) as CustomClientAttribute; // 获取自定义httpclientbase
+            var baseClient = HttpServiceExStartup.Instance.GetClient(clientAttribute?.ClientName) ?? HttpServiceExStartup.Instance.GetService<HttpClientBase>(); // 获取httpclientbase
             if (string.IsNullOrEmpty(baseClient.BaseUrl))// 未配置Api的BaseUrl地址则停止
             {
                 throw new HttpServiceException("请配置Api地址！");
             }
 
-            var httpBaseAttr = attrs?.FirstOrDefault(x => x is HttpBaseAttribute) as HttpBaseAttribute;
+            var httpBaseAttr = attrs?.FirstOrDefault(x => x is HttpBaseAttribute) as HttpBaseAttribute; // 获取aop的http标签
             var routeInfo = httpBaseAttr?.Url; // 请求路由地址
-            // 没有路由地址，则自动拼接（认为从controller而来）
-            if (string.IsNullOrEmpty(routeInfo))
+           
+            var newRouterInfo = baseClient.RouterProcedure.RouterFunc?.Invoke(targetType, name, methodBase, routeInfo); // 路由处理
+            if (!string.IsNullOrEmpty(newRouterInfo))
             {
-                var service = targetType.Name.Replace("Service", "");
-                routeInfo = $"{service}/{name}";
+                routeInfo = newRouterInfo;
             }
             var parameters = methodBase.GetParameters();
-            // 构建完整url
-            var urlResult = UrlHelper.GetUrl(arguments, parameters, baseClient.BaseUrl, routeInfo, httpBaseAttr?.UrlType);
+            var urlResult = UrlHelper.GetUrl(arguments, parameters, baseClient.BaseUrl, routeInfo, httpBaseAttr?.UrlType);// 构建完整url
             urlResult.BaseClient = baseClient;
+            var customSerializeAttri = allAttris?.FirstOrDefault(x => x is CustomSerializeAttribute) as CustomSerializeAttribute; // 找出自定义序列化特性标签
+            urlResult.CustomSeriAttri = customSerializeAttri;
             return urlResult;
         }
         /// <summary>
@@ -134,7 +139,7 @@ namespace HttpServiceExtension.Attributes
             var httpResponse = Send(urlResult, typeEnum); // 发送数据
             if (httpResponse.StatusCode == HttpStatusCode.OK)
             {
-                result = GetResultData(urlResult.BaseClient, httpResponse, rtype); // 获取数据结果
+                result = GetResultData(urlResult, httpResponse, rtype); // 获取数据结果
             }
             else
             {
@@ -181,12 +186,13 @@ namespace HttpServiceExtension.Attributes
         /// <summary>
         /// 获取数据结果
         /// </summary>
-        /// <param name="baseClient"></param>
+        /// <param name="urlResult"></param>
         /// <param name="httpResponse"></param>
         /// <param name="rtype"></param>
         /// <returns></returns>
-        private HttpRespResult GetResultData(HttpClientBase baseClient, HttpResponseMessage httpResponse, Type rtype)
+        private HttpRespResult GetResultData(UrlResult urlResult, HttpResponseMessage httpResponse, Type rtype)
         {
+            var baseClient = urlResult.BaseClient;
             var res = false;
             var result = new HttpRespResult();
             // 1. 
@@ -215,7 +221,7 @@ namespace HttpServiceExtension.Attributes
                     dynamic preResult = jsonProcess.Deserialize(json, baseClient.RespPreProcedure.RespPreDescType); // 反序列化
                     baseClient?.RespPreProcedure?.RespPreAction(preResult); // 执行预判方法
                 }
-                result.RespResult = GetJsonObjData(json, rtype, jsonProcess); // 获取json对象对应的数据
+                result.RespResult = GetJsonObjData(json, rtype, jsonProcess, urlResult.CustomSeriAttri); // 获取json对象对应的数据
             }
             return result;
         }
@@ -224,20 +230,28 @@ namespace HttpServiceExtension.Attributes
         /// </summary>
         /// <param name="json">json字符串</param>
         /// <param name="rtype">json对象类型</param>
+        /// <param name="csAttri">自定义序列化特性</param>
         /// <returns></returns>
-        private dynamic GetJsonObjData(string json, Type rtype, JsonProcess jsonProcess)
+        private dynamic GetJsonObjData(string json, Type rtype, JsonProcess jsonProcess, CustomSerializeAttribute csAttri)
         {
             dynamic result;
+            var deserialize = jsonProcess.Deserialize; // 默认的反序列化方法
+            // 获取是否存在自定义序列化配置
+            if (!string.IsNullOrEmpty(csAttri?.DeserializeName) 
+                && jsonProcess.TryGetCustomDeserialize(csAttri.DeserializeName, out Func<string, Type, object> customDeserialize))
+            {
+                deserialize = customDeserialize;
+            }
             try
             {
                 if (rtype.IsGenericType && rtype.GetGenericTypeDefinition() == typeof(Task<>)) // 异步
                 {
-                    dynamic obj = jsonProcess.Deserialize(json, rtype.GenericTypeArguments[0]) ?? Activator.CreateInstance(rtype.GenericTypeArguments[0]);
+                    dynamic obj = deserialize(json, rtype.GenericTypeArguments[0]) ?? Activator.CreateInstance(rtype.GenericTypeArguments[0]);
                     result = Task.FromResult(obj); // 结果装入Task
                 }
                 else // 同步
                 {
-                    result = jsonProcess.Deserialize(json, rtype) ?? Activator.CreateInstance(rtype);
+                    result = deserialize(json, rtype) ?? Activator.CreateInstance(rtype);
                 }
             }
             catch

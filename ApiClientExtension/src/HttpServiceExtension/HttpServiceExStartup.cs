@@ -7,12 +7,15 @@ using System.Text;
 
 namespace HttpServiceExtension
 {
-    public class Startup
+    /// <summary>
+    /// service服务配置类
+    /// </summary>
+    public class HttpServiceExStartup
     {
         private ServiceProvider _serviceProvider;
         private readonly ServiceCollection _services = new ServiceCollection();
 
-        public static Startup Instance { get; } = new Startup();
+        public static HttpServiceExStartup Instance { get; } = new HttpServiceExStartup();
         /// <summary>
         /// HttpClientBase字典
         /// </summary>
@@ -24,7 +27,7 @@ namespace HttpServiceExtension
         /// <summary>
         /// 私有构造器
         /// </summary>
-        private Startup() => ConfigureServices(_services);
+        private HttpServiceExStartup() => ConfigureServices(_services);
         /// <summary>
         /// 默认初始化的服务
         /// </summary>
@@ -80,6 +83,11 @@ namespace HttpServiceExtension
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public T GetService<T>() => _serviceProvider.GetService<T>();
+        /// <summary>
+        /// 获取注册的服务
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public object GetService(Type type) => _serviceProvider.GetService(type);
 
     }
