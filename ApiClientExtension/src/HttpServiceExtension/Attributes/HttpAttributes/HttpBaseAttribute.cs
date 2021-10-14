@@ -112,7 +112,7 @@ namespace HttpServiceExtension.Attributes
 
             var httpBaseAttr = attrs?.FirstOrDefault(x => x is HttpBaseAttribute) as HttpBaseAttribute; // 获取aop的http标签
             var routeInfo = httpBaseAttr?.Url; // 请求路由地址
-           
+
             var newRouterInfo = baseClient.RouterProcedure.RouterFunc?.Invoke(targetType, name, methodBase, routeInfo); // 路由处理
             if (!string.IsNullOrEmpty(newRouterInfo))
             {
@@ -216,11 +216,9 @@ namespace HttpServiceExtension.Attributes
                 var jsonProcess = baseClient.JsonProcedure; // json处理
                 var json = httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult(); // 读取body
                 result.RespJson = json; // 记录json
-                if (baseClient?.RespPreProcedure.RespPreAction != null && baseClient?.RespPreProcedure.RespPreDescType != null) // 预判
-                {
-                    dynamic preResult = jsonProcess.Deserialize(json, baseClient.RespPreProcedure.RespPreDescType); // 反序列化
-                    baseClient?.RespPreProcedure?.RespPreAction(preResult); // 执行预判方法
-                }
+                // 预判
+                //dynamic preResult = jsonProcess.Deserialize(json, baseClient.RespPreProcedure.RespPreDescType); // 反序列化
+                baseClient?.RespPreProcedure?.RespPreAction?.Invoke(json); // 执行预判方法
                 result.RespResult = GetJsonObjData(json, rtype, jsonProcess, urlResult.CustomSeriAttri); // 获取json对象对应的数据
             }
             return result;
@@ -237,7 +235,7 @@ namespace HttpServiceExtension.Attributes
             dynamic result;
             var deserialize = jsonProcess.Deserialize; // 默认的反序列化方法
             // 获取是否存在自定义序列化配置
-            if (!string.IsNullOrEmpty(csAttri?.DeserializeName) 
+            if (!string.IsNullOrEmpty(csAttri?.DeserializeName)
                 && jsonProcess.TryGetCustomDeserialize(csAttri.DeserializeName, out Func<string, Type, object> customDeserialize))
             {
                 deserialize = customDeserialize;

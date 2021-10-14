@@ -12,7 +12,7 @@ namespace HttpServiceExtension.Model
         /// <summary>
         /// 返回结果预处理
         /// </summary>
-        internal Action<dynamic> RespPreAction { get; set; }
+        internal Action<string> RespPreAction { get; set; }
         /// <summary>
         /// 反序列化类型
         /// </summary>

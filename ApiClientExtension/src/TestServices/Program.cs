@@ -23,6 +23,10 @@ namespace TestServices
             {
                 Console.WriteLine(info);
             });
+            clientBase.SetJsonPrePorcess(json =>
+            {
+                var sadadas = JsonSerializer.Deserialize(json, typeof(object));
+            });
             clientBase.AddCustomDeserialize("customDes", (json, type) =>
             {
                 var responseType = typeof(ApiResponse<>).MakeGenericType(type);

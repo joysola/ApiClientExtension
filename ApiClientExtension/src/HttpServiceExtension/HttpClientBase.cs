@@ -87,12 +87,12 @@ namespace HttpServiceExtension
         /// </summary>
         /// <param name="preAction">预处理委托</param>
         /// <param name="preType">返回结果反序列化类型</param>
-        public void SetJsonPrePorcess(Action<dynamic> preAction, Type preType)
+        public void SetJsonPrePorcess(Action<string> preAction/*, Type preType*/)
         {
             if (preAction != null)
             {
                 RespPreProcedure.RespPreAction = preAction;
-                RespPreProcedure.RespPreDescType = preType ?? typeof(object);
+                //RespPreProcedure.RespPreDescType = preType ?? typeof(object);
             }
         }
         /// <summary>
