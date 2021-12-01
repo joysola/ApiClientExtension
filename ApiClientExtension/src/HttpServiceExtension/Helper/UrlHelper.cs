@@ -27,8 +27,9 @@ namespace HttpServiceExtension.Helper
             {
                 var postConAttr = HttpBaseExps.Instance.GetPostContentAttribute(parameters[i]); // 获取post参数特性
                 var parNameAttr = HttpBaseExps.Instance.GetParamNameAttribute(parameters[i]); // 获取改名参数特性
+                var fromBodyAttr = HttpBaseExps.Instance.GetFromBodyAttribute(parameters[i]); // 获取FromBody参数特性
                 // 是否是post实体
-                if (postConAttr != null)
+                if (postConAttr != null || fromBodyAttr != null)
                 {
                     postModel = arguments[i]; // post参数不用拼接url
                 }

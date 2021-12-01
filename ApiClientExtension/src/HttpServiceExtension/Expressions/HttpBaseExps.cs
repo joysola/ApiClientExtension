@@ -22,6 +22,11 @@ namespace HttpServiceExtension.Expressions
         internal Func<ParameterInfo, ParamNameAttribute> GetParamNameAttribute { get; } = new Lazy<Func<ParameterInfo, ParamNameAttribute>>(()
             => BuildGetParamAttribute<ParamNameAttribute>()).Value;
         /// <summary>
+        /// 获取参数的FromBodyAttribute 特性的方法
+        /// </summary>
+        internal Func<ParameterInfo, FromBodyAttribute> GetFromBodyAttribute { get; } = new Lazy<Func<ParameterInfo, FromBodyAttribute>>(()
+            => BuildGetParamAttribute<FromBodyAttribute>()).Value;
+        /// <summary>
         /// 获取调用tostring方法的实际对象
         /// </summary>
         internal Func<object, Type> GetToStringType { get; } = new Lazy<Func<object, Type>>(() =>
