@@ -129,7 +129,23 @@ namespace HttpServiceExtension.Attributes
             if (Bench != null && HttpServiceExStartup.Instance.IsInited && BenchmarkAction != null)
             {
                 Bench.EndTime = DateTime.Now; // 记录结束时间
-                BenchmarkAction(Bench.Result); // 输出记录日志
+                if (arguments[6] is Attribute[] attrs)
+                {
+                    var clientAttribute = attrs?.FirstOrDefault(x => x is CustomClientAttribute) as CustomClientAttribute;
+                    var baseClient = HttpServiceExStartup.Instance.GetService<HttpClientBase>(); // 获取httpclientbase
+                    if (clientAttribute != null)
+                    {
+                        baseClient = HttpServiceExStartup.Instance.GetClient(clientAttribute?.ClientName) ?? HttpServiceExStartup.Instance.GetService<HttpClientBase>(); // 获取httpclientbase
+                    }
+                    if (baseClient.IsSimpleBenchmark)// 输出记录日志
+                    {
+                        BenchmarkAction(Bench.SimpleResult);
+                    }
+                    else
+                    {
+                        BenchmarkAction(Bench.Result);
+                    }
+                }
             }
         }
     }

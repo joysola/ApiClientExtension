@@ -46,7 +46,9 @@ namespace HttpServiceExtension.Model
         /// 结束时间
         /// </summary>
         internal DateTime? EndTime { get; set; }
-
+        /// <summary>
+        /// 详细结果
+        /// </summary>
         internal string Result =>
 @$"Url：{Url}；
 请求类型：{RequestType}；
@@ -58,6 +60,15 @@ namespace HttpServiceExtension.Model
 请求开始时间：{RequsetTime:yyyy-MM-dd HH:mm:ss:ffffff}；
 响应结束时间：{ResponseTime:yyyy-MM-dd HH:mm:ss:ffffff}；
 结束时间：{EndTime:yyyy-MM-dd HH:mm:ss:ffffff}；
+Api调用时长：{(ResponseTime - RequsetTime)?.TotalMilliseconds}；
+总时长：{(EndTime - StartTime)?.TotalMilliseconds}";
+        /// <summary>
+        /// 结果
+        /// </summary>
+        internal string SimpleResult => @$"Url：{Url}；
+请求类型：{RequestType}；
+类型：{TargetType.Name}；
+方法名：{MethodName}
 Api调用时长：{(ResponseTime - RequsetTime)?.TotalMilliseconds}；
 总时长：{(EndTime - StartTime)?.TotalMilliseconds}";
     }

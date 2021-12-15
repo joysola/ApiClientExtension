@@ -51,6 +51,10 @@ namespace HttpServiceExtension
             }
         }
         /// <summary>
+        /// 是否是简单测速
+        /// </summary>
+        internal bool IsSimpleBenchmark { get; set; } = true;
+        /// <summary>
         /// 构造器，依赖注入
         /// </summary>
         /// <param name="client"></param>
@@ -154,11 +158,13 @@ namespace HttpServiceExtension
         /// 设置接口调用测速
         /// </summary>
         /// <param name="action"></param>
-        public void SetBenchmark(Action<string> action)
+        /// <param name="isSimple"></param>
+        public void SetBenchmark(Action<string> action, bool isSimple = true)
         {
             if (action != null)
             {
                 BenchmarkAction = action;
+                IsSimpleBenchmark = isSimple;
             }
         }
     }
