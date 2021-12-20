@@ -4,12 +4,7 @@
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <ItemGroup>
-    <Analyzer Include="..\..\packages\AspectInjector.2.5.0\analyzers\dotnet\cs\AspectInjector.Analyzer.dll" />
-    <Analyzer Include="..\..\packages\AspectInjector.2.5.0\analyzers\dotnet\cs\AspectInjector.Broker.dll" />
-    <Analyzer Include="..\..\packages\AspectInjector.2.5.0\analyzers\dotnet\cs\AspectInjector.Rules.dll" />
-    <Analyzer Include="..\..\packages\AspectInjector.2.5.0\analyzers\dotnet\cs\FluentIL.Common.dll" />
-  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\HttpServiceExtension\HttpServiceExtension.csproj" />
     <ProjectReference Include="..\TestModel\TestModel.csproj" />

@@ -9,6 +9,24 @@ using TestModel;
 
 namespace TestServices
 {
+    public class CustomBaseService<T> : BaseService<T> where T : BaseService<T>, new()
+    {
+        public int MyProperty { get; set; } = 1;
+        public CustomBaseService()
+        {
+
+        }
+    }
+
+    public class OurCustomBaseService<T> : CustomBaseService<T> where T : BaseService<T>, new()
+    {
+        public OurCustomBaseService()
+        {
+
+        }
+    }
+
+
     public interface ITestService
     {
         string GetXXX(string name);
@@ -16,7 +34,7 @@ namespace TestServices
         LoginModel CustomPostXXX(QueryLoginModel login);
         string GetYYY(string name);
     }
-    public class TestService : BaseService<TestService>, ITestService
+    public class TestService : OurCustomBaseService<TestService>, ITestService
     {
         [CustomClient]
         [HttpGet("Test/GetXXX")]

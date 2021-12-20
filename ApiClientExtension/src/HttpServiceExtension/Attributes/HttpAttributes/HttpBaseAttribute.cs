@@ -74,7 +74,7 @@ namespace HttpServiceExtension.Attributes
         private bool IsBaseServiceRequest(Type targetType)
         {
             var result = true;
-            if (targetType.BaseType?.Name != typeof(BaseService<>).Name)
+            if (typeof(BaseService<>).MakeGenericType(targetType).IsAssignableFrom(targetType.BaseType)) // 是否从BaseService派生而来
             {
                 result = false;
             }
