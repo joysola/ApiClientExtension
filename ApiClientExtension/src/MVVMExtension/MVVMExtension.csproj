@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net461;</TargetFrameworks>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -10,9 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="AspectInjector.Broker">
-      <HintPath>..\..\lib\AspectInjector.2.4.2\lib\netstandard2.0\AspectInjector.Broker.dll</HintPath>
-    </Reference>
+    <PackageReference Include="AspectInjector" Version="2.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight">
       <HintPath>..\..\lib\GalaSoft.MvvmLight.dll</HintPath>
     </Reference>
