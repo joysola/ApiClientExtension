@@ -143,7 +143,7 @@ namespace HttpServiceExtension.Attributes
             }
             else
             {
-                throw new HttpServiceException($"WebApi访问失败！错误代码：{(int)httpResponse.StatusCode}");
+                throw new HttpServiceException($"WebApi访问失败！错误代码：{(int)httpResponse.StatusCode} {httpResponse.StatusCode}") { Code = httpResponse.StatusCode };
             }
             return result;
         }
