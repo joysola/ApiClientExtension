@@ -27,7 +27,7 @@ namespace MVVMExtension
         [Advice(Kind.After, Targets = Target.Public | Target.Setter)]
         public void AfterSetter([Argument(Source.Instance)] object sender, [Argument(Source.Name)] string propertyName)
         {
-            this.PropertyChanged?.Invoke(sender, new PropertyChangedEventArgs(propertyName));
+            this?.PropertyChanged?.Invoke(sender, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

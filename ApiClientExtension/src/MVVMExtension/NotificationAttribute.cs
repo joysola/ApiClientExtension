@@ -1,8 +1,8 @@
 ﻿using AspectInjector.Broker;
-using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text;
 
 namespace MVVMExtension
@@ -11,10 +11,16 @@ namespace MVVMExtension
     /// MVVM属性通知变化
     /// </summary>
     [Injection(typeof(NotificationAttribute))]
+    [Mixin(typeof(INotifyPropertyChanged))]
     [Aspect(Scope.PerInstance)]
     [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
-    public sealed class NotificationAttribute : Attribute
+    public sealed class NotificationAttribute : Attribute, INotifyPropertyChanged
     {
+        /// <summary>
+        /// 属性变化事件
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
         /// <summary>
         /// setter方法后调用RaisePropertyChanged
         /// </summary>
@@ -23,14 +29,7 @@ namespace MVVMExtension
         [Advice(Kind.After, Targets = Target.Public | Target.Setter)]
         public void AfterSetter([Argument(Source.Instance)] object sender, [Argument(Source.Name)] string propertyName)
         {
-            if (sender is ViewModelBase viewModel) // 针对viewmodel
-            {
-                viewModel.RaisePropertyChanged(propertyName);
-            }
-            else if (sender is ObservableObject observeObj) // 针对实体
-            {
-                observeObj.RaisePropertyChanged(propertyName);
-            }
+            this?.PropertyChanged?.Invoke(sender, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -2,7 +2,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net461;</TargetFrameworks>
-    <Version>1.0.2</Version>
+    <Version>1.0.4</Version>
+    <Authors>joysola</Authors>
+    <Company />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -10,19 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspectInjector" Version="2.6.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="GalaSoft.MvvmLight">
-      <HintPath>..\..\lib\GalaSoft.MvvmLight.dll</HintPath>
-    </Reference>
-    <Reference Include="GalaSoft.MvvmLight.Extras">
-      <HintPath>..\..\lib\GalaSoft.MvvmLight.Extras.dll</HintPath>
-    </Reference>
-    <Reference Include="GalaSoft.MvvmLight.Platform">
-      <HintPath>..\..\lib\GalaSoft.MvvmLight.Platform.dll</HintPath>
-    </Reference>
+    <PackageReference Include="AspectInjector" Version="2.6.0" />
   </ItemGroup>
 
 </Project>
