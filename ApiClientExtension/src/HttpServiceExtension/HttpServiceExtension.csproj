@@ -2,10 +2,11 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net461;netcoreapp3.1;</TargetFrameworks>
+		<Authors>joysola</Authors>
 		<LangVersion>8.0</LangVersion>
-		<Version>1.0.6</Version>
-		<AssemblyVersion>1.0.6.0</AssemblyVersion>
-		<FileVersion>1.0.5.0</FileVersion>
+		<Version>1.0.7</Version>
+		<AssemblyVersion>1.0.7.0</AssemblyVersion>
+		<FileVersion>1.0.7.0</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
