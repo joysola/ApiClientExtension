@@ -60,7 +60,7 @@ namespace HttpServiceExtension.Expressions
             // 实现如下效果：xx.GetProperty("ClientInstance", BindingFlags.Static | BindingFlags.Public)?.GetValue(null)
             var param_obj = Expression.Parameter(typeof(Type), "obj"); // 入参
             var param_propName = Expression.Parameter(typeof(string), "name"); // 入参
-            var const_bindFlags = Expression.Constant(BindingFlags.Static | BindingFlags.Public, typeof(BindingFlags)); // 常量
+            var const_bindFlags = Expression.Constant(BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy, typeof(BindingFlags)); // 常量
             var const_PropNull = Expression.Constant(null, typeof(PropertyInfo)); // PropertyInfo的 null常量
             var const_Null = Expression.Constant(null, typeof(object)); // null常量
 
