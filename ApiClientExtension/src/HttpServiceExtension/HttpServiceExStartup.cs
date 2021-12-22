@@ -129,6 +129,21 @@ namespace HttpServiceExtension
                 clientBase.SetBenchmark(benchmark, isSimple);
             }
         }
+        /// <summary>
+        /// 设置自定义请求头
+        /// </summary>
+        /// <param name="customHeader"></param>
+        /// <param name="customContent"></param>
+        /// <param name="httpClientBaseType"></param>
+        public void SetCustomRequestHead(string customHeader, string customContent, Type httpClientBaseType = null)
+        {
+            if (httpClientBaseType == null)
+            {
+                httpClientBaseType = typeof(HttpClientBase);
+            }
+            var client = GetService(httpClientBaseType) as HttpClientBase;
+            client?.SetCustomRequestHead(customHeader, customContent);
+        }
     }
     //public class PIMSService : HttpClientBase
     //{
