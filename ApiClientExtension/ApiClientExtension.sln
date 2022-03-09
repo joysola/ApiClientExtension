@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30711.63
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpClientExtension", "src\HttpClientExtension\HttpClientExtension.csproj", "{32AC2334-1397-4033-B677-C2E6FDC236F9}"
 EndProject
@@ -19,7 +19,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpServiceExtension", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestCoreWebApi", "src\TestCoreWebApi\TestCoreWebApi.csproj", "{FC9674D5-C85F-4D5D-AB94-AEA3DC9BAB0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestServices", "src\TestServices\TestServices.csproj", "{DE0E2B57-9DF6-4544-B9BA-B0039CB46035}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestServices", "src\TestServices\TestServices.csproj", "{DE0E2B57-9DF6-4544-B9BA-B0039CB46035}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVVMDependencyInjection", "src\MVVMDependencyInjection\MVVMDependencyInjection.csproj", "{095E9CCE-1BE4-46E9-A313-89B8487BBF72}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{397FB910-DB6A-4E23-97CD-62AEA3E6EE36}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestMVVMDI", "src\TestMVVMDI\TestMVVMDI.csproj", "{E9E1CD34-2918-4FDF-A66A-F9995D7FC97E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,9 +69,26 @@ Global
 		{DE0E2B57-9DF6-4544-B9BA-B0039CB46035}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE0E2B57-9DF6-4544-B9BA-B0039CB46035}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE0E2B57-9DF6-4544-B9BA-B0039CB46035}.Release|Any CPU.Build.0 = Release|Any CPU
+		{095E9CCE-1BE4-46E9-A313-89B8487BBF72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{095E9CCE-1BE4-46E9-A313-89B8487BBF72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{095E9CCE-1BE4-46E9-A313-89B8487BBF72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{095E9CCE-1BE4-46E9-A313-89B8487BBF72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9E1CD34-2918-4FDF-A66A-F9995D7FC97E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9E1CD34-2918-4FDF-A66A-F9995D7FC97E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9E1CD34-2918-4FDF-A66A-F9995D7FC97E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9E1CD34-2918-4FDF-A66A-F9995D7FC97E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0D8406CA-3AD2-456C-8540-BCCA4E02A593} = {397FB910-DB6A-4E23-97CD-62AEA3E6EE36}
+		{BB225332-39A7-4735-86F7-1456D9D05FC3} = {397FB910-DB6A-4E23-97CD-62AEA3E6EE36}
+		{1852416A-8ADB-4982-8BD9-38D2895A63B6} = {397FB910-DB6A-4E23-97CD-62AEA3E6EE36}
+		{16097AE9-5FA4-48B2-90C2-8E543B785860} = {397FB910-DB6A-4E23-97CD-62AEA3E6EE36}
+		{FC9674D5-C85F-4D5D-AB94-AEA3DC9BAB0A} = {397FB910-DB6A-4E23-97CD-62AEA3E6EE36}
+		{DE0E2B57-9DF6-4544-B9BA-B0039CB46035} = {397FB910-DB6A-4E23-97CD-62AEA3E6EE36}
+		{E9E1CD34-2918-4FDF-A66A-F9995D7FC97E} = {397FB910-DB6A-4E23-97CD-62AEA3E6EE36}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FAC7E6B4-35CA-4D43-ADEB-27467E0BB903}
