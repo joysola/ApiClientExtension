@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MVVMDependencyInjection
 {
@@ -33,7 +34,7 @@ namespace MVVMDependencyInjection
         /// <summary>
         /// 构建完成
         /// </summary>
-        public void Build()
+        public DependencyInjectStartup Build()
         {
             GetDataContextExp();
             GetSetPropExp();
@@ -42,6 +43,7 @@ namespace MVVMDependencyInjection
                 {
                     Startup.ConfigureServices(services);
                 }).Build();
+            return Startup;
         }
 
         /// <summary>
@@ -141,6 +143,25 @@ namespace MVVMDependencyInjection
             return Startup;
         }
 
+        /// <summary>
+        /// 启动
+        /// </summary>
+        /// <returns></returns>
+        public async Task StartAsync()
+        {
+            await _host.StartAsync();
+        }
+        /// <summary>
+        /// 结束
+        /// </summary>
+        /// <returns></returns>
+        public async Task StopAsync()
+        {
+            using (_host)
+            {
+                await _host.StopAsync();
+            }
+        }
 
         /// <summary>
         /// 注册类型
@@ -151,7 +172,7 @@ namespace MVVMDependencyInjection
             foreach (var keyValue in DI.TypeDict)
             {
                 //services.AddTransient(keyValue.Key); // 注册view
-                
+
                 if (keyValue.Value.Params != null) // 有参构造器
                 {
                     services.AddTransient(keyValue.Value.VMType, x => ActivatorUtilities.CreateInstance(x, keyValue.Value.VMType, keyValue.Value.Params));
