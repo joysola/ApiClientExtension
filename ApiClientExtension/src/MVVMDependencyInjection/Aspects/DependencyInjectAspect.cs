@@ -27,12 +27,12 @@ namespace MVVMDependencyInjection
         {
             if (DI.FrameworkElementType != null && DI.FrameworkElementType.IsAssignableFrom(type))
             {
-                if (DI.TypePropDict.TryGetValue(type, out List<PropertyInfo> props))
+                if (DI.TypePropDict.TryGetValue(type, out List<DIVMType> divmType))
                 {
-                    props?.ForEach(p =>
+                    divmType?.ForEach(t =>
                     {
-                        var viewModel = DependencyInjectStartup.Startup.GetViewModel(p.PropertyType);
-                        DI.SetProperty?.Invoke(instance, p, viewModel);
+                        var viewModel = DependencyInjectStartup.Startup.GetViewModel(t.Prop.PropertyType);
+                        DI.SetProperty?.Invoke(instance, t.Prop, viewModel);
                         //p.SetValue(instance,viewModel);
                     });
                 }
@@ -56,9 +56,9 @@ namespace MVVMDependencyInjection
             //
             if (DI.FrameworkElementType != null && DI.FrameworkElementType.IsAssignableFrom(type))
             {
-                if (DI.TypeDict.TryGetValue(type, out Type viewModelType))
+                if (DI.TypeDict.TryGetValue(type, out DIType diType))
                 {
-                    var viewModel = DependencyInjectStartup.Startup.GetViewModel(viewModelType);
+                    var viewModel = DependencyInjectStartup.Startup.GetViewModel(diType.VMType);
                     DI.SetDataContext?.Invoke(instance, viewModel);
                 }
             }

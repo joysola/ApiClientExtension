@@ -68,7 +68,7 @@ namespace MVVMDependencyInjection
                 throw new Exception("View或ViewModel程序集不能为空！");
             }
             DI.TypeDict.Clear();
-
+            DI.TypePropDict.Clear();
             var viewAllTypes = viewAssembly.GetTypes();
             var viewModelTypes = viewModelAssembly.GetTypes();
             foreach (var viewType in viewAllTypes)
@@ -83,13 +83,13 @@ namespace MVVMDependencyInjection
                         var attr = prop.GetCustomAttribute<VMAttribute>();
                         if (attr != null)
                         {
-                            if (DI.TypePropDict.TryGetValue(viewType, out List<PropertyInfo> existedProps))
+                            if (DI.TypePropDict.TryGetValue(viewType, out List<DIVMType> existedDIVMTypes))
                             {
-                                existedProps.Add(prop);
+                                existedDIVMTypes.Add(new DIVMType { Prop = prop, Params = attr.Params });
                             }
                             else
                             {
-                                DI.TypePropDict.Add(viewType, new List<PropertyInfo> { prop });
+                                DI.TypePropDict.Add(viewType, new List<DIVMType> { new DIVMType { Prop = prop, Params = attr.Params } });
                             }
                         }
                     }
@@ -109,7 +109,7 @@ namespace MVVMDependencyInjection
                         {
                             if (DI.ViewTypeFunc(viewType) && DI.ViewModelTypeFunc(viewModelType))
                             {
-                                DI.TypeDict.Add(viewType, viewModelType);
+                                DI.TypeDict.Add(viewType, new DIType { VMType = viewModelType, Params = diAttr.Params });
                             }
                         }
                     }
@@ -150,14 +150,29 @@ namespace MVVMDependencyInjection
         {
             foreach (var keyValue in DI.TypeDict)
             {
-                services.AddTransient(keyValue.Key);
-                services.AddTransient(keyValue.Value);
+                //services.AddTransient(keyValue.Key); // 注册view
+                
+                if (keyValue.Value.Params != null) // 有参构造器
+                {
+                    services.AddTransient(keyValue.Value.VMType, x => ActivatorUtilities.CreateInstance(x, keyValue.Value.VMType, keyValue.Value.Params));
+                }
+                else // 无参构造器
+                {
+                    services.AddTransient(keyValue.Value.VMType);
+                }
             }
             foreach (var keyValue in DI.TypePropDict)
             {
-                foreach (var prop in keyValue.Value)
+                foreach (var divmType in keyValue.Value)
                 {
-                    services.AddTransient(prop.PropertyType);
+                    if (divmType.Params != null) // 有参构造器
+                    {
+                        services.AddTransient(divmType.Prop.PropertyType, x => ActivatorUtilities.CreateInstance(x, divmType.Prop.PropertyType, divmType.Params));
+                    }
+                    else // 无参构造器
+                    {
+                        services.AddTransient(divmType.Prop.PropertyType);
+                    }
                 }
             }
         }

@@ -31,11 +31,11 @@ namespace MVVMDependencyInjection
         /// <summary>
         /// view和viewmodel类型字典
         /// </summary>
-        internal Dictionary<Type, Type> TypeDict { get; } = new Dictionary<Type, Type>();
+        internal Dictionary<Type, DIType> TypeDict { get; } = new Dictionary<Type, DIType>();
         /// <summary>
         /// view 和 对应 属性的viewmodel
         /// </summary>
-        internal Dictionary<Type, List<PropertyInfo>> TypePropDict { get; } = new Dictionary<Type, List<PropertyInfo>>();
+        internal Dictionary<Type, List<DIVMType>> TypePropDict { get; } = new Dictionary<Type, List<DIVMType>>();
         /// <summary>
         /// view设置datacontext为viewmodel对象的表达式树(参数1 view，参数2 viewmodel)
         /// </summary>

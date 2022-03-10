@@ -13,6 +13,12 @@ namespace TestMVVMDI
     [NotifyAspect]
     public class MainWindowViewModel : ObservableRecipient
     {
+        public string XXX2 { get; set; }
+        public MainWindowViewModel(string xxx, int yyy)
+        {
+            XXX2 = xxx;
+            XXX = yyy;
+        }
         public int XXX { get; set; } = 2;
 
         public ICommand AddCommand => new Lazy<AsyncRelayCommand>(() => new AsyncRelayCommand(async () =>
