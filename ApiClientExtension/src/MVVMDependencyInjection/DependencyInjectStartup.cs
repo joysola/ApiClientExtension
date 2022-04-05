@@ -117,6 +117,30 @@ namespace MVVMDependencyInjection
                     }
                 }
             }
+            // 注册Viewmodel，用于在viewmodel中使用其他viewmodel
+            foreach (var vmType in viewModelTypes)
+            {
+                var diAttr = vmType.GetCustomAttribute<DependencyInjectAttribute>();
+                if (diAttr != null)
+                {
+                    var allProps = vmType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    foreach (var prop in allProps)
+                    {
+                        var attr = prop.GetCustomAttribute<VMAttribute>();
+                        if (attr != null)
+                        {
+                            if (DI.VMTypePropDict.TryGetValue(vmType, out List<DIVMType> existedDIVMTypes))
+                            {
+                                existedDIVMTypes.Add(new DIVMType { Prop = prop, Params = attr.Params });
+                            }
+                            else
+                            {
+                                DI.VMTypePropDict.Add(vmType, new List<DIVMType> { new DIVMType { Prop = prop, Params = attr.Params } });
+                            }
+                        }
+                    }
+                }
+            }
             return Startup;
         }
         /// <summary>

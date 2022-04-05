@@ -37,6 +37,10 @@ namespace MVVMDependencyInjection
         /// </summary>
         internal Dictionary<Type, List<DIVMType>> TypePropDict { get; } = new Dictionary<Type, List<DIVMType>>();
         /// <summary>
+        /// viewmoel 和 对应 属性的viewmodel
+        /// </summary>
+        internal Dictionary<Type, List<DIVMType>> VMTypePropDict { get; } = new Dictionary<Type, List<DIVMType>>();
+        /// <summary>
         /// view设置datacontext为viewmodel对象的表达式树(参数1 view，参数2 viewmodel)
         /// </summary>
         internal Action<object, object> SetDataContext { get; set; }

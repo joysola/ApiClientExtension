@@ -19,8 +19,8 @@ namespace TestMVVMDI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    [DependencyInject(typeof(MainXXXViewModel), 2222)]
-    //[DependencyInject]
+    //[DependencyInject(typeof(MainXXXViewModel), 2222)]
+    [DependencyInject(typeof(MainWindowViewModel),"666",777)]
     public partial class MainWindow : Window
     {
         //[VM("222", 44)]

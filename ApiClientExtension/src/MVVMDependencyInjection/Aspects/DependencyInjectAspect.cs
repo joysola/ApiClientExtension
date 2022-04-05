@@ -37,6 +37,18 @@ namespace MVVMDependencyInjection
                     });
                 }
             }
+            else if (DI.ViewModelTypeFunc != null && DI.ViewModelTypeFunc(type))
+            {
+                if (DI.VMTypePropDict.TryGetValue(type, out List<DIVMType> divmTypes))
+                {
+                    divmTypes?.ForEach(t =>
+                    {
+                        var viewModel = DependencyInjectStartup.Startup.GetViewModel(t.Prop.PropertyType);
+                        DI.SetProperty?.Invoke(instance, t.Prop, viewModel);
+                            //p.SetValue(instance,viewModel);
+                        });
+                }
+            }
         }
 
         /// <summary>

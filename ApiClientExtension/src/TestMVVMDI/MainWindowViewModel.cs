@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MVVMDependencyInjection;
 using MVVMExtension;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,12 @@ using System.Windows.Input;
 
 namespace TestMVVMDI
 {
+    [DependencyInject]
     [NotifyAspect]
     public class MainWindowViewModel : ObservableRecipient
     {
+        [VM(222)]
+        public MainXXXViewModel XXXViewModel { get; set; }
         public string XXX2 { get; set; }
         public MainWindowViewModel(string xxx, int yyy)
         {
