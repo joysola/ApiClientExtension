@@ -220,6 +220,20 @@ namespace MVVMDependencyInjection
                     }
                 }
             }
+            foreach (var keyValue in DI.VMTypePropDict)
+            {
+                foreach (var divmType in keyValue.Value)
+                {
+                    if (divmType.Params != null) // 有参构造器
+                    {
+                        services.AddTransient(divmType.Prop.PropertyType, x => ActivatorUtilities.CreateInstance(x, divmType.Prop.PropertyType, divmType.Params));
+                    }
+                    else // 无参构造器
+                    {
+                        services.AddTransient(divmType.Prop.PropertyType);
+                    }
+                }
+            }
         }
         /// <summary>
         /// 获取表达式树：view.GetType().GetProperty(DI.DataContext).SetValue(view, viewModel);
