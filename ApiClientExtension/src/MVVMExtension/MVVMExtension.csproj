@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net461;</TargetFrameworks>
-    <Version>1.0.5</Version>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net461;net462;</TargetFrameworks>
+    <Version>1.0.6</Version>
     <Authors>joysola</Authors>
     <Company />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>K:\The Third Party\ApiClientExtension\ApiClientExtension\src\MVVMExtension\MVVMExtension.xml</DocumentationFile>
+    <DocumentationFile></DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
